@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">NewTrackMed</string>
+
+
+
+<!--    Common-->
+    <string name="cancel">Cancel</string>
+    <string name="edit">Edit</string>
+    <string name="navigate_back">Navigate back</string>
+
+<!--    Dose Status-->
+
+    <string name="taken">Taken</string>
+    <string name="skipped">Skipped</string>
+    <string name="missed">Missed</string>
+    <string name="rescheduled">Rescheduled</string>
+
+<!--    Dose Actions-->
+    <string name="take">Take</string>
+    <string name="un_take">UnTake</string>
+    <string name="miss">Miss</string>
+    <string name="skip">Skip</string>
+    <string name="un_skip">UnSkip</string>
+    <string name="reschedule">Reschedule</string>
+
+<!--    Top App Bar-->
+    <string name="select_date">Select Date</string>
+    <string name="add_dose_med">Add a dose or medication</string>
+    <string name="add_dose">Add a new dose</string>
+    <string name="add_medication">Add a new medication</string>
+
+
+
+    <string name="new_dose">New Dose</string>
+    <string name="new_medication">New Medication</string>
+
+<!--    MyMedications Top App Bar-->
+    <string name="add_dose_for_this_med">Add a new dose for this Medication</string>
+<!--    Add Medication Questions-->
+    <string name="enter_med_name">Enter the name of your Medication</string>
+    <string name="enter_med_name_placeholder">Medication Name</string>
+
+    <string name="enter_med_strength">Enter the strength of your Medication</string>
+    <string name="enter_med_strength_placeholder">Enter Strength</string>
+
+    <string name="enter_med_form">What form is your Medication in?</string>
+    <string name="enter_med_form_placeholder">Enter Form</string>
+
+    <string name="enter_med_as_needed_or_schedules">How do you take your Medication?</string>
+    <string name="as_needed">As Needed</string>
+    <string name="scheduled">Scheduled</string>
+
+
+</resources>
