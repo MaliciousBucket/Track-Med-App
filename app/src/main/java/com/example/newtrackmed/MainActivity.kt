@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.newtrackmed.ui.feature.home.HomeScreen
 import com.example.newtrackmed.ui.theme.NewTrackMedTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,12 +19,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             NewTrackMedTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
+//                Surface(
+//                    modifier = Modifier.fillMaxSize(),
+//                    color = MaterialTheme.colorScheme.background
+//                ) {
+//                    Greeting("Android")
+//                }
+                TrackMedNavController()
+//                HomeScreen()
             }
         }
     }

@@ -1,8 +1,10 @@
 package com.example.newtrackmed.data.repository
 
 import com.example.newtrackmed.data.dao.FrequencyDao
+import com.example.newtrackmed.data.entity.FrequencyEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 
 class FrequencyRepository(
     private val frequencyDao: FrequencyDao,
@@ -17,9 +19,9 @@ class FrequencyRepository(
 
     }
 
-    fun getAllFrequencies(){
+    fun getAllFrequencies(): Flow<List<FrequencyEntity>> =
+    frequencyDao.getAllFrequencies()
 
-    }
 
     fun getFrequencyByMedicationId(){
 

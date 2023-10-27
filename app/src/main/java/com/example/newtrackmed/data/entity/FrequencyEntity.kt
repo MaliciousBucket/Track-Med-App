@@ -20,7 +20,7 @@ data class FrequencyEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     val medicationId: Int,
-    val frequencyIntervals: String,
+    val frequencyIntervals: List<Int>,
     val frequencyType: FrequencyType,
     val asNeeded: Boolean
 )

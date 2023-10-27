@@ -45,6 +45,7 @@ data class DoseViewData internal constructor(
             mapMedicationToDoseStatusChip(medication.timeToTake, selectedDate)
         }
     )
+
 }
 //TODO: Check if its possible to avoid the list and just map to singles
 fun List<Pair<Medication, DoseEntity?>>.mapToDoseViewData(selectedDate: LocalDateTime): List<DoseViewData> {
@@ -52,6 +53,7 @@ fun List<Pair<Medication, DoseEntity?>>.mapToDoseViewData(selectedDate: LocalDat
         DoseViewData(medication, dose, selectedDate)
     }
 }
+
 
 
 fun Medication.asAsNeededDisplayDoseViewData() = DoseViewData(

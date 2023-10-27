@@ -45,6 +45,9 @@ interface DoseDao {
 
     @Query("SELECT * FROM DoseEntity WHERE medicationId = :medicationId")
     fun getDosesByMedicationId(medicationId: Int): Flow<List<DoseEntity>>
+    @Transaction
+    @Query("SELECT * FROM DoseEntity WHERE doseId = :doseId")
+    fun getDoseWithHistoryById(doseId: Int): Flow<DoseWithHistory>
 
 
     @Query("SELECT medicationId, doseId, dosage, createdTime FROM DoseEntity" +
@@ -52,6 +55,9 @@ interface DoseDao {
             " ORDER BY createdTime DESC LIMIT :limit")
     fun getLastTakenDosesByMedIds(medicationIds: List<Int>, limit: Int): Flow<List<LastTakenDose>>
 
+    @Transaction
+    @Query("SELECT * FROM DoseEntity WHERE status = 0 AND medicationId = :medicationId")
+    fun getLastTakenDoseByMedId(medicationId: Int): Flow<LastTakenDose>
     @Transaction
     @Query("SELECT * FROM DoseEntity WHERE date(createdTime) = :selectedDate")
     fun getDosesWithHistoryForSelectedDate(selectedDate: LocalDate): Flow<List<DoseEntity>>

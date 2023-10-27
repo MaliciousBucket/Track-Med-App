@@ -1,5 +1,6 @@
 package com.example.newtrackmed.ui.feature.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -23,39 +25,105 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.newtrackmed.data.model.DoseChipStatus
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.ui.component.BottomNavBar
 
 @Composable
 fun HomeScreen(){
+    val homeViewModel: HomeScreenViewModel = viewModel(
+        factory = HomeScreenViewModel.Factory
+    )
+
+    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+
+    val dateState by homeViewModel.selectedDate.collectAsStateWithLifecycle()
+
+    Log.d("Debug UI State", "UIState: $uiState")
     Scaffold (
         topBar = {
             HomeTopAppBar(
-                totalDailyDosesCount =,
-                dailyDoseProgress =,
+                totalDailyDosesCount = 8,
+                dailyDoseProgress =5,
                 onAddDoseMedClicked = { /*TODO*/ },
-                onAddMedClicked = { /*TODO*/ },
+                onAddMedClicked = { homeViewModel.onNextDateClicked() },
                 onAddDoseClicked = { /*TODO*/ },
                 onCalendarClicked = { /*TODO*/ },
-                menuExpanded =
+                menuExpanded = false
             ) {
 
             }
 
         },
         content = { innerPadding ->
+            Log.d("Debug UI", "We reached the content")
             val modifier = Modifier.padding(innerPadding)
+//            when (uiState.viewData){
+//               is DoseDisplayUIState.Success -> {
+//                    DisplayDoseCards(viewData = (uiState.viewData as DoseDisplayUIState.Success).doseViewData) {
+//
+//                    }
+////                   DisplayDoseCards(viewData = uiState.viewData.doseViewData) {
+////
+////                   }
+//                }
+//                DoseDisplayUIState.Loading -> {
+//
+//                }
+//
+//                DoseDisplayUIState.Error -> {
+//
+//                }
+//
+//
+//
+//
+//            }
 
-            DisplayDoseCards(
-                modifier,
-                viewData = ,
-                onCardClicked = )
+
+            Button(
+
+                modifier = Modifier.padding(100.dp),
+                onClick = { homeViewModel.onNextDateClicked() },
+
+                ) {
+                Log.d("Debug Button", "Rendering button")
+                Text(text = "Next Date")
+            }
+
+            Button(
+                onClick = { homeViewModel.onPreviousDateClicked() },
+
+                ) {
+                Text(text = "Previous Date")
+            }
+
+
+            OutlinedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+            ) {
+                Text(text = "Current Date State: $dateState")
+            }
+
+            Spacer(modifier = Modifier.height(50.dp))
+
+
+
+
+//            DisplayDoseCards(
+//                modifier,
+//                viewData = ,
+//                onCardClicked = )
         },
         bottomBar = {
             BottomNavBar(
@@ -159,6 +227,7 @@ fun DisplayDoseCards(
     viewData: List<DoseViewData>,
     onCardClicked: () -> Unit
 ){
+    Log.d("Debug Display Doses", "Displaying doses")
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){

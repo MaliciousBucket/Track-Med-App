@@ -11,8 +11,13 @@ class MedicationRepository (
     private val medicationDao: MedicationDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ){
+    fun getMedicationById(medicationId: Int) : Flow<MedicationEntity> =
+        medicationDao.getMedicationById(medicationId)
+
     fun getAllMedications(): Flow<List<MedicationEntity>> =
         medicationDao.getAllMedications()
 
+    fun getAllActiveMedications(): Flow<List<MedicationEntity>> =
+        medicationDao.getAllActiveMedications()
 
 }

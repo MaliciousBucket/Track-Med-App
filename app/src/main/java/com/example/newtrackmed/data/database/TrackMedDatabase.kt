@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.newtrackmed.data.dao.DoseDao
+import com.example.newtrackmed.data.dao.DoseRescheduleHistoryDao
 import com.example.newtrackmed.data.dao.FrequencyDao
 import com.example.newtrackmed.data.dao.MedicationDao
 import com.example.newtrackmed.data.entity.FrequencyEntity
@@ -53,6 +54,8 @@ abstract class TrackMedDatabase: RoomDatabase() {
     abstract fun medicationDao() : MedicationDao
     abstract fun frequencyDao() : FrequencyDao
     abstract fun doseDao() : DoseDao
+
+    abstract fun doseHistoryDao(): DoseRescheduleHistoryDao
 }
 private lateinit var INSTANCE: TrackMedDatabase
 
@@ -71,6 +74,7 @@ fun getDatabase(context: Context): TrackMedDatabase {
                             val medicationDao = INSTANCE.medicationDao()
                             val doseDao = INSTANCE.doseDao()
                             val frequencyDao = INSTANCE.frequencyDao()
+                            val doseHistoryDao = INSTANCE.doseHistoryDao()
 
                             val medicationNames = listOf("Ibuprofen", "Paracetamol")
                             val medicationTypes = listOf("Pill", "Sachet")
@@ -118,7 +122,7 @@ fun getDatabase(context: Context): TrackMedDatabase {
                                 val frequency = FrequencyEntity(
                                     id = 0, // Auto-generated
                                     medicationId = medicationId.toInt(),
-                                    frequencyIntervals = if (i == 0) "0" else "1,14,21",
+                                    frequencyIntervals = if (i == 0) listOf(0) else listOf(1,2,3),
                                     frequencyType = if (i == 0) FrequencyType.DAILY else FrequencyType.MONTH_DAYS,
                                     asNeeded = false
                                 )

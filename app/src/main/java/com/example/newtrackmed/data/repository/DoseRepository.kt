@@ -7,6 +7,7 @@ import com.example.newtrackmed.data.entity.DoseRescheduleHistory
 import com.example.newtrackmed.data.entity.DoseStatus
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.data.model.DoseWithHistory
+import com.example.newtrackmed.data.model.LastTakenDose
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -75,9 +76,10 @@ class DoseRepository(
 
 //    ----- Query -----
 
-    fun getDoseById(){
+    fun getDoseWithHistoryById(doseId: Int) : Flow<DoseWithHistory> =
+        doseDao.getDoseWithHistoryById(doseId)
 
-    }
+
 
 //    ----- By Date -----
 
@@ -115,15 +117,18 @@ class DoseRepository(
 
 
 
+
+
     fun getRescheduledDosesForDate(){
 
     }
 
 //    ----- Last Taken -----
 
-    fun getLastTakenDoseForMed(medicationId: Int){
+    fun getLastTakenDoseForMed(medicationId: Int): Flow<LastTakenDose> =
+        doseDao.getLastTakenDoseByMedId(medicationId)
 
-    }
+
 
     fun getLastTakenDosesForMedIds(medicationIds: List<Int>)  {
 
