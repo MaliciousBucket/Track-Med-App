@@ -27,6 +27,14 @@ interface MedicationDao {
     fun getMedicationById(medicationId: Int): Flow<MedicationEntity>
 
 
+    @Query("SELECT * FROM MedicationEntity")
+    suspend fun getAllSuspendMedications(): List<MedicationEntity>
+
+    @Query("SELECT * FROM MedicationEntity WHERE isActive = 1")
+    suspend fun getAllSuspendActiveMedications(): List<MedicationEntity>
+
+
+
 
 
 }

@@ -47,7 +47,7 @@ import com.example.newtrackmed.data.model.UpdateDoseData
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun TestUpdateDoseDialog(
+fun UpdateDoseDialog(
     updateDoseData: UpdateDoseData,
     onDismissRequest: () -> Unit,
     onTakeClick: () -> Unit,

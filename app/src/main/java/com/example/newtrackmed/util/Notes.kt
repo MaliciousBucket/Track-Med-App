@@ -3,19 +3,22 @@ package com.example.newtrackmed.util
 /*
 NOTES
 
-26/10/23
+Add Dose Dialog
+Date Indicator
+Date indicator use a function outside the view model for text
+Edit dialog
+Refactor dose dialog to take in Update Status
+Add medication Screens
+Medication Details screens
+Edit Medication Screens
+Dont allow for future doses to be taken
+Reports screen + writeup
+Recent Doses View
 
-Change the as needed to be in the medication entity, not the frequency
-
-Order of Operations:
-
-Add DoseDetail Composable(s)
-Add Bottom App Bar
-Add view model for home screen
-Add Edit dose and time dialog option
-Get this thing working XDDD
-
-
-
+UIStates for MyMedications:
+Main Screen
+Edit Screen (static except for change of med)
+Various edit screens (goes with add medication)
+Recent Doses state
 
 */

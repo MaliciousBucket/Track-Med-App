@@ -42,12 +42,10 @@ fun HomeScreen(){
     val homeViewModel: HomeScreenViewModel = viewModel(
         factory = HomeScreenViewModel.Factory
     )
-
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
     val dateState by homeViewModel.selectedDate.collectAsStateWithLifecycle()
 
-    Log.d("Debug UI State", "UIState: $uiState")
     Scaffold (
         topBar = {
             HomeTopAppBar(
@@ -63,50 +61,72 @@ fun HomeScreen(){
             }
 
         },
-        content = { innerPadding ->
-            Log.d("Debug UI", "We reached the content")
+        bottomBar = {
+            BottomNavBar(
+                onHomeClick = { /*TODO*/ },
+                onMyMedicationsClick = { /*TODO*/ },
+                onReportsClick = {}
+            )
+        },
+    )
+    { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
+        ) {
+
             val modifier = Modifier.padding(innerPadding)
-//            when (uiState.viewData){
-//               is DoseDisplayUIState.Success -> {
-//                    DisplayDoseCards(viewData = (uiState.viewData as DoseDisplayUIState.Success).doseViewData) {
-//
-//                    }
-////                   DisplayDoseCards(viewData = uiState.viewData.doseViewData) {
-////
-////                   }
-//                }
-//                DoseDisplayUIState.Loading -> {
-//
-//                }
-//
-//                DoseDisplayUIState.Error -> {
-//
-//                }
-//
-//
-//
-//
-//            }
+            when (uiState.viewData) {
+                is DoseDisplayUIState.Success -> {
+                    DisplayDoseCards(
+//                        modifier = modifier,
+                        viewData = (uiState.viewData as DoseDisplayUIState.Success).doseViewData
+                    )
+                    { medicationId, doseId ->
+                        homeViewModel.onCardClicked(medicationId, doseId)
+                    }
 
+                }
 
+                DoseDisplayUIState.Loading -> {
+
+                }
+
+                DoseDisplayUIState.Error -> {
+
+                }
+                else -> {}
+            }
+            when (uiState.dialogUIState) {
+                is UpdateDoseDialogUIState.Success -> {
+                    (uiState.dialogUIState as UpdateDoseDialogUIState.Success).updateDoseData?.let {
+                        UpdateDoseDialog(
+                            updateDoseData = it,
+                            onDismissRequest = { homeViewModel.onCancelDialogClicked()},
+                            onTakeClick = { homeViewModel.onTakeClicked() },
+                            onUnTakeClick = { homeViewModel.onUnTakeClicked() },
+                            onSkipClick = { homeViewModel.onSkippedClicked() },
+                            onMissedClick = { homeViewModel.onMissedClicked() },
+                            onCancelClick = { homeViewModel.onCancelDialogClicked() },
+                            onEditClick = { /*TODO*/ }) {
+
+                        }
+                    }
+                }
+                is UpdateDoseDialogUIState.Hidden -> {
+                }
+            }
             Button(
-
-                modifier = Modifier.padding(100.dp),
                 onClick = { homeViewModel.onNextDateClicked() },
-
                 ) {
-                Log.d("Debug Button", "Rendering button")
                 Text(text = "Next Date")
             }
-
             Button(
                 onClick = { homeViewModel.onPreviousDateClicked() },
-
                 ) {
                 Text(text = "Previous Date")
             }
-
-
             OutlinedCard(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -117,22 +137,10 @@ fun HomeScreen(){
 
             Spacer(modifier = Modifier.height(50.dp))
 
-
-
-
-//            DisplayDoseCards(
-//                modifier,
-//                viewData = ,
-//                onCardClicked = )
-        },
-        bottomBar = {
-            BottomNavBar(
-                onHomeClick = { /*TODO*/ },
-                onMyMedicationsClick = { /*TODO*/ },
-                onReportsClick = {}
-            )
         }
-    )
+    }
+
+
 }
 
 //TODO: Check recent dose item for layout
@@ -142,6 +150,7 @@ fun DoseCard(
     viewData: DoseViewData,
     onCardClicked: () -> Unit,
 ){
+    Log.d("Debug Dose Card", "Recieved: $viewData")
     val cardWidth = 360.dp
     val cardHeight = 72.dp
 
@@ -225,15 +234,17 @@ fun DoseStatusChip(
 fun DisplayDoseCards(
     modifier: Modifier = Modifier,
     viewData: List<DoseViewData>,
-    onCardClicked: () -> Unit
+    onCardClicked: (Int, Int?) -> Unit
 ){
     Log.d("Debug Display Doses", "Displaying doses")
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ){
         itemsIndexed(viewData){ index, item ->
             DoseCard(viewData = item) {
-                onCardClicked()
+                onCardClicked(item.medicationId, item.doseId)
             }
 //            Spacer(Modifier.height(8.dp))
         }

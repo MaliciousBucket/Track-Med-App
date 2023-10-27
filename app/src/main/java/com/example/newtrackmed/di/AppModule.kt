@@ -12,6 +12,7 @@ import com.example.newtrackmed.data.repository.DoseRepository
 import com.example.newtrackmed.data.repository.FrequencyRepository
 import com.example.newtrackmed.data.repository.MedicationDoseCompositeRepository
 import com.example.newtrackmed.data.repository.MedicationRepository
+import kotlinx.coroutines.CoroutineScope
 
 interface AppModule {
     val database: RoomDatabase
@@ -26,11 +27,15 @@ interface AppModule {
     val medicationRepository: MedicationRepository
     val frequencyRepository: FrequencyRepository
     val compositeRepository: MedicationDoseCompositeRepository
+
 }
 
 class AppModuleImpl(
-    private val appContext: Context
+    private val appContext: Context,
+    private val coroutineScope: CoroutineScope
 ): AppModule {
+
+
 
     override val database: TrackMedDatabase = getDatabase(appContext)
 
@@ -66,7 +71,11 @@ class AppModuleImpl(
         MedicationDoseCompositeRepository(
             doseRepository,
             medicationRepository,
-            frequencyRepository
+            frequencyRepository,
+            medicationDao,
+            doseDao,
+            frequencyDao,
+            coroutineScope
         )
     }
 

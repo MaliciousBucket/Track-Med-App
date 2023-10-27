@@ -372,14 +372,16 @@ fun MedDetailsAsNeededSwitch(
 
 @Composable
 fun DosesForTodayView(
-    onCardClicked: () -> Unit,
+    onCardClicked: (Int, Int?) -> Unit,
     viewData: List<DoseViewData>
 ){
     RecentDosesExpandableCard(title = "Doses For Today") {
         if(viewData.isNotEmpty()) {
-            DisplayDoseCards(viewData = viewData) {
-                onCardClicked()
-            }
+            DisplayDoseCards(
+                viewData = viewData,
+                onCardClicked = onCardClicked
+            )
+
         } else {
             Text(text = "No doses for today!")
         }
@@ -519,7 +521,7 @@ fun MyMedicationsDetailScreenPreview(){
             DosesTakenForToday(recentDoses = recentDosePreviewList, onCardClicked = {})
             Spacer(modifier = Modifier.height(16.dp))
 
-            DosesForTodayView(onCardClicked = {  }, viewData = doseViewDataList)
+//            DosesForTodayView(onCardClicked = {  }, viewData = doseViewDataList)
 
 
         }

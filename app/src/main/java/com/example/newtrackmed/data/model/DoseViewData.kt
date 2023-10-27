@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import com.example.newtrackmed.R
 import com.example.newtrackmed.data.entity.DoseEntity
 import com.example.newtrackmed.data.entity.DoseStatus
+import com.example.newtrackmed.data.entity.MedicationEntity
 import java.time.LocalDateTime
 
 
@@ -67,6 +68,18 @@ fun Medication.asAsNeededDisplayDoseViewData() = DoseViewData(
     doseTime = timeToTake,
     chipStatus = DoseChipStatus.Upcoming
 
+)
+
+fun MedicationEntity.asDisplayDoseViewData() = DoseViewData(
+    medicationId = id,
+    doseId = null,
+    name = name,
+    type = type,
+    dosage = dosage,
+    dosageUnit = dosageUnit,
+    unitsTaken = unitsTaken,
+    doseTime = timeToTake,
+    chipStatus = DoseChipStatus.Upcoming
 )
 
 fun mapMedicationToDoseStatusChip(timeToTake: LocalTime, selectedDate: LocalDateTime) : DoseChipStatus {

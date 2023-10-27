@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.newtrackmed.ui.feature.home.HomeScreen
+import com.example.newtrackmed.ui.feature.mymedications.MyMedicationsScreen
 import com.example.newtrackmed.ui.theme.NewTrackMedTheme
 
 class MainActivity : ComponentActivity() {
@@ -25,8 +26,10 @@ class MainActivity : ComponentActivity() {
 //                ) {
 //                    Greeting("Android")
 //                }
-                TrackMedNavController()
+                //TrackMedNavController()
 //                HomeScreen()
+
+                MyMedicationsScreen()
             }
         }
     }

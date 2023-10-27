@@ -1,13 +1,17 @@
 package com.example.newtrackmed.ui.feature.mymedications
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -18,17 +22,104 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.newtrackmed.R
 import com.example.newtrackmed.data.model.MyMedicationsViewData
+import com.example.newtrackmed.ui.component.BottomNavBar
 import com.example.newtrackmed.ui.feature.home.DoseCardMedDetails
 import com.example.newtrackmed.ui.feature.home.LastDoseChip
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyMedicationsScreen(){
+    val myMedsViewModel: MyMedicationsViewModel = viewModel(
+        factory = MyMedicationsViewModel.Factory
+    )
+
+    val uiState by myMedsViewModel.uiState.collectAsStateWithLifecycle()
+
+    Scaffold(
+        topBar = {
+//            MyMedicationsTopAppBar(
+//                title = ,
+//                isMainScreen = ,
+//                menuExpanded = ,
+//                showAddButton = ,
+//                canNavigateBack = ,
+//                onAddButtonClicked = { /*TODO*/ },
+//                onNavigateBackPressed = { /*TODO*/ },
+//                onAddMedicationClicked = { /*TODO*/ },
+//                onAddDoseClicked = { /*TODO*/ },
+//                onAddDoseForMedClicked = { /*TODO*/ },
+//                onDropDownMenuDismissRequest = { }
+//            )
+                 CenterAlignedTopAppBar(title = { Text(text = "MyMedications") })
+        },
+        bottomBar = {
+            BottomNavBar(
+                onHomeClick = { /*TODO*/ },
+                onMyMedicationsClick = { /*TODO*/ },
+                onReportsClick = {}
+            )
+        },
+
+    )
+    {innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
+        ){
+            when (uiState.myMedicationsScreen) {
+                is MyMedicationsScreenUiState.Overview -> {
+                    MyMedicationsOverviewScreen(
+                        onListItemClicked = {},
+                        uiState = uiState.myMedicationsOverview
+                    )
+                }
+                is MyMedicationsScreenUiState.Details -> {
+                    Text(text = "Well, We're at the details")
+                }
+            }
+        }
+    }
+
+
+
+}
+
+@Composable
+fun MyMedicationsOverviewScreen(
+    modifier: Modifier = Modifier,
+    onListItemClicked: (Int) -> Unit,
+    uiState: MyMedicationsOverviewUiState
+){
+    when (uiState) {
+        is MyMedicationsOverviewUiState.Success -> {
+            if (uiState.myMedicationsViewData.isEmpty()){
+                Text(text = "Emppty List!")
+            } else {
+                DisplayMyMedicationsList(
+                    myMedicationViewDataList = uiState.myMedicationsViewData,
+                    onListItemClick = onListItemClicked)
+            }
+        }
+        is MyMedicationsOverviewUiState.Loading -> {
+            Text(text = "I should put a loading indicator here....")
+        }
+        is MyMedicationsOverviewUiState.Error -> {
+            Text(text = "I need an error screen...")
+        }
+    }
 
 }
 
@@ -37,10 +128,22 @@ fun DisplayMyMedicationsList(
     myMedicationViewDataList: List<MyMedicationsViewData>,
     onListItemClick: (Int) -> Unit
 ){
-    LazyColumn{
-        itemsIndexed(
-            myMedicationViewDataList
-        ){ _, item ->
+    val (activeItems, inactiveItems) = myMedicationViewDataList.partition { it.isActive }
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        itemsIndexed(activeItems) { _, item ->
+            MyMedicationListItem(viewData = item) {
+                onListItemClick(item.medicationId)
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        itemsIndexed(inactiveItems) { _, item ->
             MyMedicationListItem(viewData = item) {
                 onListItemClick(item.medicationId)
             }

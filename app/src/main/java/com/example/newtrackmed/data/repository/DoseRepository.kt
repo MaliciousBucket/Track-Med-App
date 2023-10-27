@@ -38,32 +38,32 @@ class DoseRepository(
         doseDao.updateDose(doseEntity)
     }
 
-    suspend fun updateDoseStatus(
-        doseId: Int,
-        doseStatus: DoseStatus){
-        val status = doseStatus.ordinal
-        doseDao.updateDoseStatus(doseId, status)
-    }
+//    suspend fun updateDoseStatus(
+//        doseId: Int,
+//        doseStatus: DoseStatus){
+//        val status = doseStatus.ordinal
+//        doseDao.updateDoseStatus(doseId, status)
+//    }
 
-    suspend fun rescheduleDose(
-        doseId: Int,
-        originalTime: LocalDateTime,
-        rescheduledTo: LocalDateTime,
-        reason: String?){
-        val status = DoseStatus.RESCHEDULED.ordinal
-
-        val history = DoseRescheduleHistory(
-            historyId = 0,
-            doseId = doseId,
-            originalTime = originalTime,
-            rescheduledTime = rescheduledTo,
-            rescheduleReason = reason
-        )
-        doseDao.updateDoseStatus(doseId, status)
-
-        doseRescheduleHistoryDao.insertDoseRescheduleHistory(history)
-
-    }
+//    suspend fun rescheduleDose(
+//        doseId: Int,
+//        originalTime: LocalDateTime,
+//        rescheduledTo: LocalDateTime,
+//        reason: String?){
+//        val status = DoseStatus.RESCHEDULED.ordinal
+//
+//        val history = DoseRescheduleHistory(
+//            historyId = 0,
+//            doseId = doseId,
+//            originalTime = originalTime,
+//            rescheduledTime = rescheduledTo,
+//            rescheduleReason = reason
+//        )
+//        doseDao.updateDoseStatus(doseId, status)
+//
+//        doseRescheduleHistoryDao.insertDoseRescheduleHistory(history)
+//
+//    }
 //    ----- DELETE -----
 
     suspend fun deleteDose(dose: DoseEntity){

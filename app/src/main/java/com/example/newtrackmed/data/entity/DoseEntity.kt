@@ -42,6 +42,17 @@ fun DoseEntity.asLastTaken() = LastTakenDose(
     dosage = dosage
 )
 
+fun MedicationEntity.mapToDoseEntity(
+    status: DoseStatus,
+    updateTime: LocalDateTime?,
+    newDosage: Int?) = DoseEntity(
+    doseId = 0,
+    medicationId = id,
+    status = status,
+    dosage = newDosage ?: dosage,
+    createdTime = updateTime ?: LocalDateTime.now()
+)
+
 
 //sealed class DoseStatuses(val id: Int, @StringRes val stringValue: Int) {
 //    object Taken : DoseStatuses(1, R.string.taken)

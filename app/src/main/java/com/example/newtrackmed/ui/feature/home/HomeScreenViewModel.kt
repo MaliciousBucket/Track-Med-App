@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.newtrackmed.data.Result
 import com.example.newtrackmed.data.asResult
 import com.example.newtrackmed.data.entity.DoseEntity
+import com.example.newtrackmed.data.entity.DoseStatus
 import com.example.newtrackmed.data.entity.FrequencyEntity
 import com.example.newtrackmed.data.entity.FrequencyType
 import com.example.newtrackmed.data.entity.MedicationEntity
@@ -39,10 +40,15 @@ import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.LocalTime
 
 data class TestUIState(
     val viewData:DoseDisplayUIState,
-    val dateUiState: SelectedDateUIState
+    val dateUiState: SelectedDateUIState,
+    val dialogUIState: UpdateDoseDialogUIState
 )
 
 
@@ -62,9 +68,8 @@ sealed interface DoseDisplayUIState {
 
 @Immutable
 sealed interface UpdateDoseDialogUIState {
-    data class Success(val updateDoseData: UpdateDoseData): UpdateDoseDialogUIState
-    object Loading: UpdateDoseDialogUIState
-    object Error: UpdateDoseDialogUIState
+    data class Success(val updateDoseData: UpdateDoseData?): UpdateDoseDialogUIState
+    object Hidden: UpdateDoseDialogUIState
 }
 
 @Immutable
@@ -72,6 +77,7 @@ sealed interface SelectedDateUIState{
     data class Success(
         val selectedDate: LocalDateTime
     ): SelectedDateUIState
+    object Loading: SelectedDateUIState
 //    data class Loading(val displayText: String,)
 
 }
@@ -90,372 +96,200 @@ class HomeScreenViewModel(
 
     val selectedDate = _selectedDate.asStateFlow()
 
-//    private val _allMedications = MutableStateFlow<List<Medication>>(emptyList())
 
-    private val _allMedications: Flow<List<MedicationEntity>> =
-        medicationRepository.getAllMedications()
+    fun refreshData() {
 
-//    private val _activeMeds = MutableStateFlow<List<Medication>>(emptyList())
+    }
 
-    private val _activeMeds: Flow<List<MedicationEntity>> =
-        medicationRepository.getAllActiveMedications()
+    fun onDateChange(newDate: LocalDateTime) {
+
+    }
+
+    private val _flowMeds: Flow<Result<List<DoseViewData>>> =
+        compositeRepository.testMeds().asResult()
+
+    private val furtherTesting: Flow<Result<List<DoseViewData>>> = _selectedDate.map {it }
+        .distinctUntilChanged().flatMapLatest { selectedDate ->
+            compositeRepository.createTestData(selectedDate).asResult()
+        }
 
 
-    private val _medicationIdsForDate = MutableStateFlow(setOf<Int>())
+//    private val furtherTesting: Flow<Result<List<DoseViewData>>> = _selectedDate.flatMapLatest { selectedDate ->
+//        compositeRepository.createTestData(selectedDate).asResult()
+//    }
 
-//    private val _allFrequencies = MutableStateFlow<List<FrequencyEntity>>(emptyList())
-
-    private val _allFrequencies: Flow<List<FrequencyEntity>> =
-        frequencyRepository.getAllFrequencies()
+    private val _showDialogState = MutableStateFlow<UpdateDoseDialogUIState>(UpdateDoseDialogUIState.Hidden)
 
 
-    private val filteredMedications: Flow<List<Medication>> = combine(
-        _allMedications,
+    private val _updateDoseData = MutableStateFlow<UpdateDoseData?>(null)
+
+
+
+
+    init {
+        viewModelScope.launch {
+            compositeRepository.setup()
+        }
+
+    }
+
+    val uiState: StateFlow<TestUIState> = combine(
+        furtherTesting,
         _selectedDate,
-        _allFrequencies
-    ) { medications, selectedDate, frequencies ->
-        val medsAndFreqs = medications.map { medication ->
-            medication to frequencies.find { it.medicationId == medication.id }
+        _showDialogState
+//        dialogState
+    ) { doseDataResult, currentData, dialogState  ->
+        val doseState: DoseDisplayUIState = when (doseDataResult) {
+            is Result.Success -> DoseDisplayUIState.Success(doseDataResult.data)
+            is Result.Loading -> DoseDisplayUIState.Loading
+            is Result.Error -> DoseDisplayUIState.Error
+            else -> {
+                DoseDisplayUIState.Error
+            }
         }
 
-        // Apply filtering logic
-        medsAndFreqs.filter { (medication, frequency) ->
-            if (frequency == null) {
-                return@filter false
-            }
-            if (frequency.asNeeded) {
-                return@filter true
-            }
-            val interval = frequency.frequencyIntervals
-            val daysBetween = ChronoUnit.DAYS.between(medication.startDate, selectedDate)
-            val selectedDayOfWeek = selectedDate.dayOfWeek.value
-            val selectedDayOfMonth = selectedDate.dayOfMonth
-            when (frequency.frequencyType) {
-                FrequencyType.DAILY -> {
-                    return@filter true
-                }
+        val dateState: SelectedDateUIState = SelectedDateUIState.Success(LocalDateTime.now())
 
-                FrequencyType.EVERY_OTHER -> {
-                    return@filter daysBetween % 2 == 0L
-                }
-
-                FrequencyType.EVERY_X_DAYS -> {
-                    return@filter daysBetween % frequency.frequencyIntervals[0] == 0L
-                }
-
-                FrequencyType.WEEK_DAYS -> {
-                    return@filter frequency.frequencyIntervals.contains(selectedDayOfWeek)
-                }
-
-                FrequencyType.MONTH_DAYS -> {
-                    return@filter frequency.frequencyIntervals.contains(selectedDayOfMonth)
-                }
-            }
-
-            true
-        }.mapNotNull { (medication, _) -> medication }
-    }.distinctUntilChanged()
-        .map { medicationEntityList ->
-            medicationEntityList.map { it.asDisplayModel() }
+        val dialogState: UpdateDoseDialogUIState = when (dialogState) {
+            is UpdateDoseDialogUIState.Success -> UpdateDoseDialogUIState.Success(_updateDoseData.value)
+            is UpdateDoseDialogUIState.Hidden ->UpdateDoseDialogUIState.Hidden
         }
 
-
-    val testDosesForDate: Flow<List<DoseEntity>> =
-        _selectedDate.flatMapLatest { selectedDate ->
-            doseRepository.getDosesForSelectedDate(selectedDate)
-        }.distinctUntilChanged()
-
-
-
-
-
-//TODO: PLACRHOLDER OLD ONE
-//    private val doseViewDataList: Flow<List<DoseViewData>> = flow {
-//        coroutineScope {
-//            val innerFlow = combine(
-//                filteredMedications,
-//                testDosesForDate,
-//                _allFrequencies
-//            ) { filteredMeds, dosesForDate, allFrequencies ->
-//                filteredMeds.flatMap { medication ->
-//                    val correspondingDoses = dosesForDate.filter { it.medicationId == medication.id }
-//                    val correspondingFrequency = allFrequencies.find { it.medicationId == medication.id }
-//                    val innerList = mutableListOf<DoseViewData>()
-//
-//                    if (correspondingFrequency?.asNeeded == true) {
-//                        innerList.add(medication.asAsNeededDisplayDoseViewData())
-//                    }
-//
-//                    innerList.addAll(correspondingDoses.map { dose ->
-//                        DoseViewData(
-//                            medicationId = medication.id,
-//                            doseId = dose.doseId,
-//                            name = medication.name,
-//                            type = medication.type,
-//                            dosage = medication.dosage,
-//                            dosageUnit = medication.dosageUnit,
-//                            unitsTaken = medication.unitsTaken,
-//                            doseTime = dose.createdTime.toLocalTime(),
-//                            chipStatus = mapDoseStatusToChipStatus(dose.status)
-//                        )
-//                    })
-//
-//                    innerList
-//                }
-//            }
-//            innerFlow.collect { viewDataList ->
-//                emit(viewDataList)
-//            }
-//        }
-//    }
+    TestUIState(
+        doseState,
+        dateState,
+         dialogState
+    )
+}.stateIn(
+    scope = viewModelScope,
+//    started = SharingStarted.WhileSubscribed(5000),
+        started= SharingStarted.Lazily,
+    initialValue = TestUIState(
+        DoseDisplayUIState.Loading,
+        SelectedDateUIState.Success(LocalDateTime.now()),
+        UpdateDoseDialogUIState.Hidden
+    )
+)
+fun onCardClicked(medicationId: Int, doseId: Int?) {
+    Log.d("Card Clicked", "Card: $medicationId")
+    viewModelScope.launch {
+        val updateData = compositeRepository.getUpdateDoseData(medicationId, doseId)
+            .distinctUntilChanged()
+            .first()
+        _updateDoseData.update { updateData }
+        _showDialogState.update { UpdateDoseDialogUIState.Success(_updateDoseData.value) }
+    }
+}
 
 
-
-
-
-//    private val doseViewDataListResult: Flow<Result<List<DoseViewData>>> =
-//        createDoseViewDataListFlow(
-//            filteredMedications,
-//            testDosesForDate,
-//            _allFrequencies,
-//
-//        ).asResult()
-
-
-
-
-
-
-
-
-
-
-
-
-//    fun createDoseViewDataList(
-//        filteredMedications: List<Medication>,
-//        testDosesForDate: List<DoseEntity>,
-//        allFrequencies: List<FrequencyEntity>
-//    ): List<DoseViewData> {
-//
-//        return filteredMedications.flatMap { medication ->
-//            val correspondingDoses = testDosesForDate.filter { it.medicationId == medication.id }
-//            val correspondingFrequency = allFrequencies.find { it.medicationId == medication.id }
-//            val innerList = mutableListOf<DoseViewData>()
-//
-//            if (correspondingFrequency?.asNeeded == true) {
-//                innerList.add(medication.asAsNeededDisplayDoseViewData())
-//            }
-//
-//            innerList.addAll(correspondingDoses.map { dose ->
-//                DoseViewData(
-//                    medicationId = medication.id,
-//                    doseId = dose.doseId,
-//                    name = medication.name,
-//                    type = medication.type,
-//                    dosage = medication.dosage,
-//                    dosageUnit = medication.dosageUnit,
-//                    unitsTaken = medication.unitsTaken,
-//                    doseTime = dose.createdTime.toLocalTime(),
-//                    chipStatus = mapDoseStatusToChipStatus(dose.status)
-//                )
-//            })
-//            innerList
-//        }
-//    }
-
-    fun createDoseViewDataList(
-        filteredMedications: List<Medication>,
-        testDosesForDate: List<DoseEntity>,
-        allFrequencies: List<FrequencyEntity>
-    ): Result<List<DoseViewData>> {
-        return try {
-            val result = filteredMedications.flatMap { medication ->
-                val correspondingDoses = testDosesForDate.filter { it.medicationId == medication.id }
-                val correspondingFrequency = allFrequencies.find { it.medicationId == medication.id }
-                val innerList = mutableListOf<DoseViewData>()
-
-                if (correspondingFrequency?.asNeeded == true) {
-                    innerList.add(medication.asAsNeededDisplayDoseViewData())
-                }
-
-                innerList.addAll(correspondingDoses.map { dose ->
-                    DoseViewData(
-                        medicationId = medication.id,
-                        doseId = dose.doseId,
-                        name = medication.name,
-                        type = medication.type,
-                        dosage = medication.dosage,
-                        dosageUnit = medication.dosageUnit,
-                        unitsTaken = medication.unitsTaken,
-                        doseTime = dose.createdTime.toLocalTime(),
-                        chipStatus = mapDoseStatusToChipStatus(dose.status)
-                    )
-                })
-                innerList
+    fun onCancelDialogClicked(){
+        viewModelScope.launch {
+            withContext(Dispatchers.Default){
+                _showDialogState.update { UpdateDoseDialogUIState.Hidden }
             }
-            Result.Success(result)
-        } catch (e: Exception) {
-            Result.Error(e)
+        }
+    }
+
+    fun onTakeClicked() {
+//        viewModelScope.launch {
+
+//        }
+        //onCancelDialogClicked()
+        viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+                _showDialogState.update { UpdateDoseDialogUIState.Hidden }
+                val updateData = _updateDoseData.value
+                if (updateData != null) {
+                    val selectedDate = _selectedDate.value
+                    val updateTime = if (selectedDate.toLocalDate().isBefore(LocalDate.now())) {
+                        selectedDate.toLocalDate().atTime(updateData?.doseTime)
+                    } else {
+                        LocalDateTime.now()
+                    }
+                    if (updateData.doseId != null) {
+                        compositeRepository.updateDoseStatus(
+                            updateData.doseId,
+                            DoseStatus.TAKEN,
+                            updateTime
+                        )
+                    } else {
+                        compositeRepository.createDose(
+                            updateData.medicationId,
+                            DoseStatus.TAKEN,
+                            null,
+                            updateTime
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun onUnTakeClicked(){
+        viewModelScope.launch {
+            _showDialogState.update { UpdateDoseDialogUIState.Hidden }
+            if(_selectedDate.value.isBefore(LocalDateTime.now())){
+                val missedDate = _selectedDate.value.toLocalDate()
+                val missedDateTime = missedDate.atTime(_updateDoseData.value?.doseTime ?: LocalTime.now() )
+                _updateDoseData.value?.doseId?.let {
+                    Log.d("Debug UnTake", "MissedTime: $missedDateTime")
+                    compositeRepository.updateDoseStatus(it, DoseStatus.MISSED, missedDateTime ) }
+            } else {
+                _updateDoseData.value?.doseId?.let { compositeRepository.deleteDose(it) }
+            }
         }
     }
 
 
-    val testMeds = MutableStateFlow<List<Medication>>(emptyList())
-    val exampleFrequencis = MutableStateFlow<List<FrequencyEntity>>(emptyList())
-    val exampleDoses = MutableStateFlow<List<DoseEntity>>(emptyList())
-
-    val testMedsList: List<Medication> = emptyList()
-    val exampleFrequenciesList: List<FrequencyEntity> = emptyList()
-    val exampleDosesList: List<DoseEntity> = emptyList()
-
-    //TODO: Very CLose
-
-//    private val doseViewDataList: Flow<Result<List<DoseViewData>>> = flow {
-//        try {
-//            combine(
-//                filteredMedications,
-//                testDosesForDate,
-//                _allFrequencies
-//            ) { filteredMeds, dosesForDate, allFrequencies ->
-//                filteredMeds.flatMap { medication ->
-//                    val correspondingDoses = dosesForDate.filter { it.medicationId == medication.id }
-//                    val correspondingFrequency = allFrequencies.find { it.medicationId == medication.id }
-//                    val innerList = mutableListOf<DoseViewData>()
-//
-//                    if (correspondingFrequency?.asNeeded == true) {
-//                        innerList.add(medication.asAsNeededDisplayDoseViewData())
-//                    }
-//
-//                    innerList.addAll(correspondingDoses.map { dose ->
-//                        DoseViewData(
-//                            medicationId = medication.id,
-//                            doseId = dose.doseId,
-//                            name = medication.name,
-//                            type = medication.type,
-//                            dosage = medication.dosage,
-//                            dosageUnit = medication.dosageUnit,
-//                            unitsTaken = medication.unitsTaken,
-//                            doseTime = dose.createdTime.toLocalTime(),
-//                            chipStatus = mapDoseStatusToChipStatus(dose.status)
-//                        )
-//                    })
-//
-//                    innerList
-//                }
-//            }.collect { viewDataList ->
-//                emit(Result.Success(viewDataList))
-//            }
-//        } catch (e: Exception) {
-//            emit(Result.Error(e))
-//        }
-//    }.flowOn(Dispatchers.IO)
-
-    private val doseViewDataList: Flow<List<DoseViewData>> = flow {
-        try {
-            combine(
-                filteredMedications,
-                testDosesForDate,
-                _allFrequencies
-            ) { filteredMeds, dosesForDate, allFrequencies ->
-                filteredMeds.flatMap { medication ->
-                    val correspondingDoses = dosesForDate.filter { it.medicationId == medication.id }
-                    val correspondingFrequency = allFrequencies.find { it.medicationId == medication.id }
-                    val innerList = mutableListOf<DoseViewData>()
-
-                    if (correspondingFrequency?.asNeeded == true) {
-                        innerList.add(medication.asAsNeededDisplayDoseViewData())
-                    }
-
-                    innerList.addAll(correspondingDoses.map { dose ->
-                        DoseViewData(
-                            medicationId = medication.id,
-                            doseId = dose.doseId,
-                            name = medication.name,
-                            type = medication.type,
-                            dosage = medication.dosage,
-                            dosageUnit = medication.dosageUnit,
-                            unitsTaken = medication.unitsTaken,
-                            doseTime = dose.createdTime.toLocalTime(),
-                            chipStatus = mapDoseStatusToChipStatus(dose.status)
-                        )
-                    })
-
-                    innerList
+    fun onSkippedClicked() {
+        viewModelScope.launch {
+            _showDialogState.update { UpdateDoseDialogUIState.Hidden }
+            val updateData = _updateDoseData.value
+            if (updateData != null) {
+                val selectedDate = _selectedDate.value
+                val updateTime = if (selectedDate.toLocalDate().isBefore(LocalDate.now())) {
+                    selectedDate.toLocalDate().atTime(updateData?.doseTime)
+                } else {
+                    LocalDateTime.now()
                 }
-            }.collect { viewDataList ->
-                Log.d("Debug View Data", "$viewDataList")
-                emit(viewDataList)
+                if (updateData.doseId != null) {
+                    compositeRepository.updateDoseStatus(
+                        updateData.doseId,
+                        DoseStatus.SKIPPED,
+                        updateTime
+                    )
+                }
             }
-        } catch (e: Exception) {
-            // Log or handle the error as you see fit
         }
-    }.flowOn(Dispatchers.IO)
-        .onEach {
-            Log.d("Debug Get Data", "We getting data")
-        }
+    }
 
-
-
-
-    private val doseViewDataListTEST: Flow<Result<List<DoseViewData>>> = doseViewDataList.asResult()
-
-
-    val uiState: StateFlow<TestUIState> = combine(
-        doseViewDataListTEST,
-       // doseViewDataList,
-        _selectedDate
-    ){ doseDataResult, currentData ->
-
-//        val doseResult: DoseDisplayUIState = when (doseDataResult){
-//                val (data) = doseDataResult
-//            Result.Success(doseDataResult) -> DoseDisplayUIState.Success(
-//            Result.Loading -> DoseDisplayUIState.Loading
-//            Result.Error() -> DoseDisplayUIState.Error
-//            com.example.newtrackmed.data.Result.Success(doseDataResult) -> DoseDisplayUIState.Success(doseDataResult)
-////            Result.isError
-//        }
-        val doseResult: DoseDisplayUIState = when (doseDataResult) {
-           is Result.Success -> {
-               val (data) = doseDataResult
-               DoseDisplayUIState.Success(data)
+    fun onMissedClicked(){
+        viewModelScope.launch {
+            if(_selectedDate.value.isAfter(LocalDateTime.now())){
+                val missedDate = _selectedDate.value.toLocalDate()
+                val missedDateTime = missedDate.atTime(_updateDoseData.value?.doseTime ?: LocalTime.now() )
+                _updateDoseData.value?.doseId?.let {
+                    compositeRepository.missDose(it, missedDateTime ) }
+            } else {
+                _updateDoseData.value?.doseId?.let { compositeRepository.deleteDose(it) }
             }
-            is Result.Loading -> DoseDisplayUIState.Loading
-            is Result.Error -> DoseDisplayUIState.Error
+            _showDialogState.update { UpdateDoseDialogUIState.Hidden }
+        }
+    }
 
-       }
-
-        val date: SelectedDateUIState = SelectedDateUIState.Success(_selectedDate.value)
-
-        TestUIState(
-            doseResult,
-            date
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = TestUIState(
-            DoseDisplayUIState.Loading,
-            SelectedDateUIState.Success(LocalDateTime.now())
-        )
-    )
 
     fun onNextDateClicked() {
-        Log.d("Next Date Clicked", "Before Change: ${_selectedDate.value}")
         val newDate = _selectedDate.value.plusDays(1)
         _selectedDate.update { it.plusDays(1) }
-        Log.d("Next Date Clicked", "After Change: ${_selectedDate.value}")
-
     }
 
     fun onPreviousDateClicked() {
-        Log.d("Next Date Clicked", "Before Change: ${_selectedDate.value}")
-        val newDate = _selectedDate.value.plusDays(1)
+        val newDate = _selectedDate.value.minusDays(1)
         _selectedDate.update {newDate
         }
-        Log.d("Next Date Clicked", "After Change: ${_selectedDate.value}")
-
     }
+
+
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
