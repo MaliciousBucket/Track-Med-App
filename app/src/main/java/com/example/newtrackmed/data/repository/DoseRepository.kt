@@ -5,6 +5,7 @@ import com.example.newtrackmed.data.dao.DoseRescheduleHistoryDao
 import com.example.newtrackmed.data.entity.DoseEntity
 import com.example.newtrackmed.data.entity.DoseRescheduleHistory
 import com.example.newtrackmed.data.entity.DoseStatus
+import com.example.newtrackmed.data.model.DoseCount
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.data.model.DoseWithHistory
 import com.example.newtrackmed.data.model.LastTakenDose
@@ -137,6 +138,10 @@ class DoseRepository(
     fun getLastTakenDosesForAllMeds(){
 
     }
+
+    //Reports
+    fun getDoseCounts(): Flow<List<DoseCount>> =
+        doseDao.getDoseCountByStatus().flowOn(Dispatchers.IO)
 
 
 

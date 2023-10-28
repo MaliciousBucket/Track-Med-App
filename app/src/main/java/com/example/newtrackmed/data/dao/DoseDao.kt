@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.example.newtrackmed.data.entity.DoseEntity
 import com.example.newtrackmed.data.entity.DoseStatus
+import com.example.newtrackmed.data.model.DoseCount
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.data.model.DoseWithHistory
 import com.example.newtrackmed.data.model.LastTakenDose
@@ -81,6 +82,11 @@ interface DoseDao {
 
     @Query("SELECT * FROM DoseEntity WHERE date(createdTime) = :selectedDate")
     suspend fun getAllSuspendDosesForDate(selectedDate: LocalDate): List<DoseEntity>
+
+    //Reports
+    @Query("SELECT status, COUNT(*) as count FROM DoseEntity GROUP BY status")
+    fun getDoseCountByStatus(): Flow<List<DoseCount>>
+
 
 }
 

@@ -16,4 +16,7 @@ interface FrequencyDao {
 
     @Query("SELECT * FROM FrequencyEntity")
     suspend fun getAllSuspendFrequencies(): List<FrequencyEntity>
+
+    @Query("SELECT * FROM FrequencyEntity WHERE medicationId = :medicationId")
+    fun getFrequencyByMedicationId(medicationId: Int): Flow<FrequencyEntity>
 }

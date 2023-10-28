@@ -82,12 +82,22 @@ fun MyMedicationsScreen(){
             when (uiState.myMedicationsScreen) {
                 is MyMedicationsScreenUiState.Overview -> {
                     MyMedicationsOverviewScreen(
-                        onListItemClicked = {},
+                        onListItemClicked = {medicationId ->
+                            myMedsViewModel.onMyMedsListItemClicked(medicationId)},
                         uiState = uiState.myMedicationsOverview
                     )
                 }
                 is MyMedicationsScreenUiState.Details -> {
-                    Text(text = "Well, We're at the details")
+                    MyMedsDetailScreen(
+                        medUiState = uiState.displayMedication,
+                        frequencyUiState = uiState.displayFrequency,
+                        onEditNameStrengthClicked = { /*TODO*/ },
+                        onEditNotesInstructionsClicked = { },
+                        onEditFrequencyClicked = { /*TODO*/ },
+                        onEditTimeClicked = { /*TODO*/ },
+                        onAsNeededClicked = { /*TODO*/ },
+                        onIsActiveClicked = { }
+                    )
                 }
             }
         }

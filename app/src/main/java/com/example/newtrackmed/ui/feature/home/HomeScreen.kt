@@ -250,3 +250,24 @@ fun DisplayDoseCards(
         }
     }
 }
+
+@Composable
+fun UpcomingDosesForToday(
+
+){
+
+}
+
+@Composable
+fun RecentDosesView(
+
+){
+
+}
+
+@Composable
+fun RecentDosesViewContainer(
+
+){
+
+}

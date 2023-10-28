@@ -324,29 +324,35 @@ class MedicationDoseCompositeRepository(
     }
 
     private val _allFlowMedications: Flow<List<MedicationEntity>> =
-        medicationDao.getAllMedications()
+        medicationDao.getAllMedications().onEach { Log.d ("Debug Meds", "Collecting a med") }
 
 
     fun getMyMedicationsViewData(): Flow<List<MyMedicationsViewData>> {
-        val medicationIdsFlow: Flow<List<Int>> = _allMedications.map { meds ->
+        val medicationIdsFlow: Flow<List<Int>> = _allFlowMedications.map { meds ->
             meds.map { it.id }
         }
         val lastTakenDoses: Flow<List<LastTakenDose>> = medicationIdsFlow.flatMapLatest { ids ->
             if (ids.isNotEmpty()) {
+                Log.d("Debug All Meds", "IDS: $ids")
                doseDao.getLastTakenDosesByMedIds(ids, limit = 1)
             } else {
+                Log.d("Debug All Last Doses", "Empty List??")
                 flowOf(emptyList())
             }
         }
-        val allMedications: Flow<List<MedicationEntity>> = _allMedications
+        val allMedications: Flow<List<MedicationEntity>> = _allFlowMedications
         return combine(allMedications, lastTakenDoses){medications, doses ->
+            Log.d("Debug All Meds", "All meds: $medications All doses: $doses")
             medications.map {medication ->
                 val lastDose = doses.find { it.medicationId == medication.id }
                 medication.mapToMyMedicationsViewData(lastDose)
             }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     fun getMedicationForDisplay(medicationId: Int): Flow<MedicationEntity> =
         medicationDao.getMedicationById(medicationId)
+
+    fun getFrequencyForDisplay(medicationId: Int): Flow<FrequencyEntity> =
+        frequencyDao.getFrequencyByMedicationId(medicationId)
 }

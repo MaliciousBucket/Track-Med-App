@@ -1,5 +1,6 @@
 package com.example.newtrackmed.ui.feature.mymedications
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -15,18 +16,22 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.newtrackmed.data.entity.FrequencyEntity
 import com.example.newtrackmed.data.entity.MedicationEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 
 data class MyMedicationsUiState(
     val myMedicationsOverview: MyMedicationsOverviewUiState,
     val myMedicationsScreen: MyMedicationsScreenUiState,
-    val displayMedication: DisplayMedication
+    val displayMedication: DisplayMedication,
+    val displayFrequency: DisplayMedFrequency
 )
 
 
@@ -51,6 +56,13 @@ sealed interface DisplayMedication {
     object Error: DisplayMedication
 }
 
+@Immutable
+sealed interface DisplayMedFrequency {
+    data class Success(val frequency: FrequencyEntity) : DisplayMedFrequency
+    object Loading: DisplayMedFrequency
+    object Error: DisplayMedFrequency
+}
+
 
 
 class MyMedicationsViewModel(
@@ -70,13 +82,18 @@ class MyMedicationsViewModel(
         _medicationIdForDisplay.map { it }.distinctUntilChanged().flatMapLatest { id ->
             compositeRepository.getMedicationForDisplay(id).asResult()
         }
+    private val _displayFrequency: Flow<Result<FrequencyEntity>> =
+        _medicationIdForDisplay.map { it }.distinctUntilChanged().flatMapLatest { id ->
+            compositeRepository.getFrequencyForDisplay(id).asResult()
+        }
 
 
     val uiState: StateFlow<MyMedicationsUiState> = combine(
         _myMedications,
         _screenUiState,
-        _displayMedication
-    ){ myMeds, screenUiState, displayMed ->
+        _displayMedication,
+        _displayFrequency
+    ){ myMeds, screenUiState, displayMed, displayFreq ->
 
         val myMedsState: MyMedicationsOverviewUiState = when(myMeds){
             is Result.Success -> MyMedicationsOverviewUiState.Success(myMeds.data)
@@ -95,10 +112,17 @@ class MyMedicationsViewModel(
             is Result.Error -> DisplayMedication.Error
         }
 
+        val frequencyForDisplay: DisplayMedFrequency = when (displayFreq) {
+            is Result.Success -> DisplayMedFrequency.Success(displayFreq.data)
+            is Result.Loading -> DisplayMedFrequency.Loading
+            is Result.Error -> DisplayMedFrequency.Error
+        }
+
         MyMedicationsUiState(
             myMedsState,
             screenState,
-            medicationForDisplay
+            medicationForDisplay,
+            frequencyForDisplay
         )
     }.stateIn(
         scope = viewModelScope,
@@ -106,9 +130,19 @@ class MyMedicationsViewModel(
         initialValue = MyMedicationsUiState(
             MyMedicationsOverviewUiState.Loading,
             MyMedicationsScreenUiState.Overview,
-            DisplayMedication.Loading
+            DisplayMedication.Loading,
+            DisplayMedFrequency.Loading
         )
     )
+
+    fun onMyMedsListItemClicked(medicationId: Int){
+        Log.d("Debug List Item Clicked", "Item Clicked: $medicationId")
+        viewModelScope.launch {
+            _medicationIdForDisplay.update { medicationId }
+            _screenUiState.update { MyMedicationsScreenUiState.Details }
+
+        }
+    }
 
     companion object{
         val Factory: ViewModelProvider.Factory = viewModelFactory {

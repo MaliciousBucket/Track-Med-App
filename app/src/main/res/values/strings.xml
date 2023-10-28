@@ -7,6 +7,10 @@
     <string name="cancel">Cancel</string>
     <string name="edit">Edit</string>
     <string name="navigate_back">Navigate back</string>
+    <string name="expand_or_collapse">Expand or collapse</string>
+
+    <string name="notes">Notes</string>
+    <string name="instructions">Instructions</string>
 
 <!--    Dose Status-->
 
@@ -50,5 +54,29 @@
     <string name="as_needed">As Needed</string>
     <string name="scheduled">Scheduled</string>
 
+<!--    MyMedications-->
+    <string name="medication_details">Medication Details</string>
+    <string name="notes_and_instructions">Notes and Instructions</string>
+    <string name="med_is_active">This Medication Is Currently Active</string>
+    <string name="med_is_not_active">This Medication Is Currently Inactive</string>
 
+    <string name="edit_name_strength">Edit medication name and strength</string>
+    <string name="edit_notes_instructions">Edit medication notes and instructions</string>
+    <string name="edit_frequency">Edit medication frequency</string>
+    <string name="edit_med_time">Edit medication timing</string>
+
+<!--          Loading Messages        -->
+<!--    Home Loading Messages-->
+    <string name="home_screen_loading_message">Loading Doses....</string>
+        <!--    MyMedications Loading Messages-->
+    <string name="loading_my_meds_details_screen_message">Loading Medication Details...</string>
+    <string name="loading_frequency_details">Loading Frequency Details For Medication </string>
+
+<!--    Error Messages-->
+    <string name="loading_daily_doses_error">There was an error loading the Doses for this date</string>
+    <string name="loading_med_details_error">There was an error loading the details of this Medication</string>
+    <string name="loading_frequency_error">There was an error loading the Frequency Details for this Medication</string>
+    <string name="loading_as_needed_error">There was an error determining if this Medication is taken As Needed</string>
+<!--    Icons-->
+    <string name="error_icon_description">Error</string>
 </resources>

@@ -1,27 +1,25 @@
 package com.example.newtrackmed.ui.feature.mymedications
 
-import androidx.compose.foundation.background
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Switch
@@ -34,123 +32,328 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.newtrackmed.data.doseViewDataList
+import com.example.newtrackmed.R
 import com.example.newtrackmed.data.entity.FrequencyType
-import com.example.newtrackmed.data.model.DoseViewData
-import com.example.newtrackmed.data.model.RecentDoseDetails
-import com.example.newtrackmed.data.previewUpdateDoseData
-import com.example.newtrackmed.data.recentDosePreviewList
-import com.example.newtrackmed.ui.feature.home.DisplayDoseCards
-import com.example.newtrackmed.ui.feature.home.DoseStatusChip
+import com.example.newtrackmed.data.entity.MedicationEntity
+import com.example.newtrackmed.data.previewMedicationEntities
+import com.example.newtrackmed.ui.component.ErrorScreenDisplay
+import com.example.newtrackmed.ui.component.LoadingScreenDisplay
 import com.example.newtrackmed.ui.theme.NewTrackMedTheme
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-import java.util.jar.Attributes.Name
 
 @Composable
-fun MyMedicationsDetailScreen(){
+fun MyMedsDetailScreen(
+    medUiState: DisplayMedication,
+    frequencyUiState: DisplayMedFrequency,
+    modifier: Modifier = Modifier,
+    onEditNameStrengthClicked: () -> Unit,
+    onEditNotesInstructionsClicked: () -> Unit,
+    onEditTimeClicked: () -> Unit,
+    onEditFrequencyClicked: () -> Unit,
+    onAsNeededClicked: () -> Unit,
+    onIsActiveClicked: () -> Unit
+){
+    when (medUiState) {
 
+        is DisplayMedication.Success -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                MedicationDetailsNameStrengthCard(
+                    medication = medUiState.medication,
+                    onMeNameStrengthClicked = {onEditNameStrengthClicked()}
+                )
+                NotesInstructionsDetailsCard(
+                    notes = medUiState.medication.notes,
+                    instructions = medUiState.medication.instructions,
+                    onEditNotesInstructionsClicked = { onEditNotesInstructionsClicked() }
+                )
+                MedicationDetailsFrequencyCard(
+                    displayMedUiState = medUiState,
+                    frequencyUiState = frequencyUiState,
+                    onMedTimeDetailsClicked = { onEditTimeClicked() },
+                    onFrequencyDetailsClick = { onEditFrequencyClicked() },
+                    onAsNeededChanged = {onAsNeededClicked()}
+                )
+                MedDetailsIsActiveCard(
+                    isActive = medUiState.medication.isActive,
+                    onAsNeededChanged = {onAsNeededClicked()}
+                )
+
+            }
+        }
+
+        is DisplayMedication.Loading -> {
+            LoadingScreenDisplay(title = R.string.loading_my_meds_details_screen_message)
+        }
+
+        is DisplayMedication.Error -> {
+            ErrorScreenDisplay(title = R.string.loading_med_details_error)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MedicationDetailsNameStrengthCard(
+    medication: MedicationEntity,
+    onMeNameStrengthClicked: () -> Unit
+){
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(id = R.string.medication_details),
+            style = MaterialTheme.typography.titleMedium,
+            textDecoration = TextDecoration.Underline
+        )
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(0.dp),
+            onClick = {onMeNameStrengthClicked()}
+        ) {
+            Row(
+                modifier = Modifier.padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text(
+                        text = medication.name,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        text = "${medication.dosage}${medication.dosageUnit} ${medication.type}(s)",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                Icon(
+                    modifier = Modifier
+                        .size(32.dp),
+                    imageVector = Icons.AutoMirrored.Filled.NavigateNext,
+                    contentDescription = stringResource(R.string.edit_name_strength)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NotesInstructionsDetailsCard(
+    notes: String?,
+    instructions: String?,
+    onEditNotesInstructionsClicked: () -> Unit
+){
+    OutlinedCard(
+        shape = RoundedCornerShape(0.dp),
+        onClick = {onEditNotesInstructionsClicked()}
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(R.string.notes_and_instructions),
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Icon(
+                    modifier = Modifier
+                        .size(32.dp),
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = stringResource(R.string.edit_notes_instructions)
+                )
+            }
+            HorizontalDivider()
+            ExpandableDetailsCard(
+                title = R.string.notes,
+                content = notes
+            )
+            HorizontalDivider()
+            ExpandableDetailsCard(
+                title = R.string.instructions,
+                content = instructions
+            )
+        }
+    }
 }
 
 @Composable
-fun MedicationDetailsNameStrengthCard(){
-
+fun ExpandableDetailsCard(
+    @StringRes title: Int,
+    content: String?
+){
+    var expanded by remember { mutableStateOf(false) }
+    Card(
+        shape = RoundedCornerShape(0.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded }
+    ) {
+        Column {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(title),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(8.dp)
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.NavigateNext,
+                    contentDescription = stringResource(R.string.expand_or_collapse),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .graphicsLayer(rotationZ = if (expanded) 90f else 0f)
+                )
+            }
+            if (expanded) {
+                if(content != null)
+                    Text(
+                        text = content,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(4.dp)
+                    )
+            }
+        }
+        HorizontalDivider()
+    }
 }
 
 @Composable
 fun MedicationDetailsFrequencyCard(
-    frequencyType: FrequencyType,
-    asNeeded: Boolean,
-    interval: String,
-    startDate: LocalDate,
-    endDate: LocalDate,
-    timeToTake: LocalTime,
-    dosage: Int,
-    dosageUnit: String,
-    unitsTaken: Int,
-    type: String
-    //TODO: Add the on click events
-
+    displayMedUiState: DisplayMedication,
+    frequencyUiState: DisplayMedFrequency,
+    onMedTimeDetailsClicked: () -> Unit,
+    onFrequencyDetailsClick: () -> Unit,
+    onAsNeededChanged: () -> Unit
 ){
     Column(
         
     ) {
         Text(
             text = "Frequency",
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            textDecoration = TextDecoration.Underline
         )
         Column(
             
         ) {
-            OutlinedCard(
-                shape = RoundedCornerShape(0.dp),
-            ) {
-                Column(
+            when (displayMedUiState){
+                is DisplayMedication.Success -> {
+                    MedFrequencyDetailsCard(
+                        frequencyUiState = frequencyUiState,
+                        onFrequencyDetailsClick = { onFrequencyDetailsClick()}
+                    )
+                    MedTimeDetailsCard(
+                        medication = displayMedUiState.medication,
+                        onMedTimeDetailsClicked = {onMedTimeDetailsClicked()}
+                    )
+                    MedStartEndDateDetailsCard(
+                        startDate = displayMedUiState.medication.startDate,
+                        endDate = displayMedUiState.medication.endDate
+                    )
+                    MedDetailsAsNeededSwitch(
+                        frequencyUiState = frequencyUiState,
+                        onAsNeededChanged = {onAsNeededChanged()}
+                        )
+                }
 
-                ) {
-                   MedicationDetailsFrequencyDetails(
-                       frequencyType = frequencyType,
-                       asNeeded = asNeeded,
-                       interval = interval)
-                    }
-            }
-            OutlinedCard(
-                shape = RoundedCornerShape(0.dp),
-            ) {
-                FrequencyTimeDetails(
-                    timeToTake = timeToTake,
-                    dosage = dosage,
-                    dosageUnit = dosageUnit,
-                    unitsTaken = unitsTaken,
-                    type = type
-                )
-            }
-            MedicationDetailsStartEndDates(
-                startDate = startDate,
-                endDate = endDate
-            )
+                is DisplayMedication.Loading -> {
 
-            MedDetailsAsNeededSwitch(asNeeded = asNeeded) {
-                
+                }
+
+                is DisplayMedication.Error -> {
+
+                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MedicationDetailsFrequencyDetails(
-    frequencyType: FrequencyType,
-    asNeeded: Boolean,
-    interval: String
+fun MedFrequencyDetailsCard(
+    frequencyUiState: DisplayMedFrequency,
+    onFrequencyDetailsClick: () -> Unit
 ){
-    val (primaryText, secondaryText) = getFrequencyTypeText(frequencyType, asNeeded, interval)
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Text(
-            text = primaryText,
-            style = MaterialTheme.typography.headlineSmall
-        )
-        Text(
-            text = secondaryText,
-            style = MaterialTheme.typography.titleMedium
+    when (frequencyUiState) {
+        is DisplayMedFrequency.Success -> {
+            val frequency = frequencyUiState.frequency
+            val (primaryText, secondaryText) = getFrequencyTypeText(
+                frequency.frequencyType,
+                frequency.asNeeded,
+                frequency.frequencyIntervals
             )
-        
+            OutlinedCard(
+                shape = RoundedCornerShape(0.dp),
+                onClick = {
+                    onFrequencyDetailsClick()
+                }
+            ) {
+                Row (
+                    modifier = Modifier.padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = primaryText,
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                        Text(
+                            text = secondaryText,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                    Icon(
+                        modifier = Modifier
+                            .size(32.dp),
+                        imageVector = Icons.AutoMirrored.Filled.NavigateNext,
+                        contentDescription = stringResource(R.string.edit_frequency)
+                    )
+                }
+            }
+
+        }
+        is DisplayMedFrequency.Loading -> {
+            MyMedsDetailsLoadingCard(title = R.string.loading_frequency_details)
+        }
+
+        is DisplayMedFrequency.Error -> {
+            MyMedsDetailsErrorCard(title = R.string.loading_frequency_error)
+        }
     }
 }
 
 //TODO: Refactor to use string resources
-fun getFrequencyTypeText(type: FrequencyType, asNeeded: Boolean, interval: String) : Pair<String, String>{
+//TODO: Refactor to account for int instead of string
+fun getFrequencyTypeText(type: FrequencyType, asNeeded: Boolean, interval: List<Int>) : Pair<String, String>{
     if(asNeeded){
         return Pair("As Needed", "Take as needed")
     }
@@ -173,30 +376,43 @@ fun getFrequencyTypeText(type: FrequencyType, asNeeded: Boolean, interval: Strin
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FrequencyTimeDetails(
-    timeToTake: LocalTime,
-    dosage: Int,
-    dosageUnit: String,
-    unitsTaken: Int,
-    type: String
+fun MedTimeDetailsCard(
+     medication: MedicationEntity,
+    onMedTimeDetailsClicked: () -> Unit
 ){
     val formatter = DateTimeFormatter.ofPattern("hh:mm a")
-    val formattedTime = timeToTake.format(formatter)
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+    val formattedTime = medication.timeToTake.format(formatter)
+    OutlinedCard(
+        shape = RoundedCornerShape(0.dp),
+        onClick = { onMedTimeDetailsClicked()}
     ) {
-        Text(
-            text = formattedTime,
-            style = MaterialTheme.typography.headlineSmall
-        )
-        Text(
-            text = "Take $unitsTaken $dosage$dosageUnit $type(s)",
-            style = MaterialTheme.typography.titleMedium
-        )
+        Row (
+            modifier = Modifier.padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = formattedTime,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = "Take ${medication.unitsTaken} ${medication.dosage} ${medication.type}(s)",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Icon(
+                modifier = Modifier
+                    .size(32.dp),
+                imageVector = Icons.AutoMirrored.Filled.NavigateNext,
+                contentDescription = stringResource(R.string.edit_med_time)
+            )
+        }
+
     }
 }
 
@@ -222,7 +438,7 @@ private fun formatDate(localDate: LocalDate): String {
 }
 
 @Composable
-fun MedicationDetailsStartEndDates(
+fun MedStartEndDateDetailsCard(
     startDate: LocalDate,
     endDate: LocalDate
 ){
@@ -236,104 +452,101 @@ fun MedicationDetailsStartEndDates(
             .padding(0.dp, 16.dp, 0.dp, 16.dp),
         shape = RoundedCornerShape(0.dp),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            Text(
-                modifier = Modifier.padding(2.dp),
-                text = "Start Date: $formattedStartDateSimple",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = "You started taking this medication on: $formattedStartDate",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                modifier = Modifier.padding(2.dp),
-                text = "End Date: $formattedEndDateSimple",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = "You are due to stop taking this medication on: $formattedEndDate",
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-    }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RecentDoseItem(
-    recentDose: RecentDoseDetails,
-    onClick: (Int) -> Unit,
-){
-    OutlinedCard(
-        modifier =Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(0.dp),
-        onClick = { onClick(recentDose.doseId)}
-    ) {
-        Row(
-            Modifier
-                .padding(start = 16.dp, top = 8.dp, end = 10.dp, bottom = 8.dp)
-                .fillMaxWidth(),
-//            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+        Row (
+            modifier = Modifier.padding(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ){
-            RecentDoseItemDetails(
-                modifier = Modifier.fillMaxWidth(),
-                name = recentDose.name,
-                dosage = recentDose.dosage,
-                type = recentDose.type,
-                takenTime = recentDose.doseTime
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    modifier = Modifier.padding(2.dp),
+                    text = "Start Date: $formattedStartDateSimple",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(
+                    text = "You started taking this medication on: $formattedStartDate",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    modifier = Modifier.padding(2.dp),
+                    text = "End Date: $formattedEndDateSimple",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(
+                    text = "You are due to stop taking this medication on: $formattedEndDate",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Icon(
+                modifier = Modifier.size(32.dp),
+                imageVector = Icons.AutoMirrored.Filled.NavigateNext,
+                contentDescription = stringResource(R.string.edit_med_time)
             )
-
-            DoseStatusChip(chipStatus = recentDose.chipStatus)
         }
     }
-}
 
-@Composable
-fun RecentDoseItemDetails(
-    modifier: Modifier,
-    name: String,
-    dosage: Int,
-    type: String,
-    takenTime: LocalDateTime
-
-){
-    val formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yy")
-    val formattedTime = takenTime.format(formatter)
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.Start,
-    ){
-        Text(text = formattedTime)
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(text = name)
-            HorizontalDivider(modifier = Modifier
-                .padding(0.dp)
-                .width(1.dp)
-                .height(20.dp)
-                .background(color = Color(0xFFCAC4D0))
-            )
-            Text(text = "$dosage $type(s)")
-        }
-    }
 }
 
 @Composable
 fun MedDetailsAsNeededSwitch(
-    asNeeded: Boolean,
-    onCheckChange: () -> Unit
+    frequencyUiState: DisplayMedFrequency,
+    onAsNeededChanged: () -> Unit
 ){
+    when (frequencyUiState) {
+        is DisplayMedFrequency.Success -> {
+            OutlinedCard (
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(0.dp),
+            ){
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Take As Needed",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Switch(
+                        checked = frequencyUiState.frequency.asNeeded,
+                        onCheckedChange = {
+                            onAsNeededChanged()
+                        },
+                        thumbContent = if (frequencyUiState.frequency.asNeeded) {
+                            {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                                )
+                            }
+                        } else {
+                            null
+                        }
+                    )
+                }
+            }
+        }
+        is DisplayMedFrequency.Loading -> {
+            MyMedsDetailsLoadingCard(title = R.string.loading_frequency_details)
+        }
+
+        is DisplayMedFrequency.Error -> {
+            MyMedsDetailsErrorCard(title = R.string.loading_as_needed_error)
+        }
+    }
+
+}
+
+@Composable
+fun MedDetailsIsActiveCard(
+    isActive: Boolean,
+    onAsNeededChanged: () -> Unit
+){
+    val title = if (isActive) R.string.med_is_active else R.string.med_is_not_active
+
     OutlinedCard (
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(0.dp),
@@ -344,15 +557,15 @@ fun MedDetailsAsNeededSwitch(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Take As Needed",
-                style = MaterialTheme.typography.headlineSmall
-                )
+                text = stringResource(title),
+                style = MaterialTheme.typography.titleMedium
+            )
             Switch(
-                checked = asNeeded,
+                checked = isActive,
                 onCheckedChange = {
-                    onCheckChange()
+                    onAsNeededChanged()
                 },
-                thumbContent = if (asNeeded) {
+                thumbContent = if (isActive) {
                     {
                         Icon(
                             imageVector = Icons.Filled.Check,
@@ -368,162 +581,16 @@ fun MedDetailsAsNeededSwitch(
     }
 }
 
-
-
-@Composable
-fun DosesForTodayView(
-    onCardClicked: (Int, Int?) -> Unit,
-    viewData: List<DoseViewData>
-){
-    RecentDosesExpandableCard(title = "Doses For Today") {
-        if(viewData.isNotEmpty()) {
-            DisplayDoseCards(
-                viewData = viewData,
-                onCardClicked = onCardClicked
-            )
-
-        } else {
-            Text(text = "No doses for today!")
-        }
-    }
-
-}
-
-@Composable
-fun DosesTakenForToday(
-    recentDoses: List<RecentDoseDetails>,
-    onCardClicked: (Int) -> Unit
-){
-    if(recentDoses.isNotEmpty()){
-        RecentDosesExpandableCard(title = "Doses Taken Today") {
-            DisplayRecentDoses(recentDoses = recentDoses, onCardClicked = onCardClicked)
-      
-        }
-    }
-}
-
-@Composable
-fun DisplayRecentDoses(
-    recentDoses: List<RecentDoseDetails>,
-    onCardClicked: (Int) -> Unit
-) {
-    LazyColumn {
-        itemsIndexed(
-            recentDoses,
-            key = { _, item ->
-                item.doseId
-            }
-        ) { _, item ->
-            RecentDoseItem(recentDose = item, onClick = onCardClicked)
-        }
-    }
-}
-
-@Composable
-fun RecentDosesExpandableCard(
-    title: String,
-    content: @Composable () -> Unit,
-
-) {
-    var expanded by remember { mutableStateOf(true) }
-
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = !expanded }
-
-    ) {
-        Column(
-            modifier = Modifier.padding(4.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(24.dp)
-                )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.NavigateNext,
-                    contentDescription = "Expand/Collapse Arrow",
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .graphicsLayer(rotationZ = if (expanded) 90f else 0f)
-                )
-            }
-            if (expanded) {
-                content()
-            }
-        }
-        HorizontalDivider()
-    }
-}
-//}
-
-
-
-@Composable
-fun UpcomingDosesForToday(
-
-){
-
-}
-
-@Composable
-fun RecentDosesView(
-
-){
-
-}
-
-@Composable
-fun RecentDosesViewContainer(
-
-){
-
-}
-
 @Preview(showBackground = true)
 @Composable
 fun MyMedicationsDetailScreenPreview(){
-
-
-
     NewTrackMedTheme {
         Column(modifier = Modifier.padding(16.dp)) {
-            MedDetailsAsNeededSwitch(true, {})
-            Spacer(modifier = Modifier.height(16.dp))
-            MedicationDetailsFrequencyDetails(
-                frequencyType = FrequencyType.WEEK_DAYS,
-                asNeeded = false,
-                interval = "Monday, Tuesday, Friday"
-            )
 
-            MedicationDetailsFrequencyCard(
-                frequencyType = FrequencyType.WEEK_DAYS,
-                asNeeded = false,
-                interval = "Monday, Tuesday, Friday",
-                startDate = LocalDate.ofYearDay(2023, 186),
-                endDate = LocalDate.now().plusDays(6),
-                timeToTake = LocalTime.of(12, 20),
-                dosage = 50,
-                dosageUnit = "mg",
-                unitsTaken = 2,
-                type = "pill",
-            )
-
-//            DisplayRecentDoses(recentDoses = recentDosePreviewList, onCardClicked = {} )
-            DosesTakenForToday(recentDoses = recentDosePreviewList, onCardClicked = {})
-            Spacer(modifier = Modifier.height(16.dp))
-
-//            DosesForTodayView(onCardClicked = {  }, viewData = doseViewDataList)
-
-
+        MedicationDetailsNameStrengthCard(medication = previewMedicationEntities[0]) {
+            
+        }
+            
         }
     }
 }
