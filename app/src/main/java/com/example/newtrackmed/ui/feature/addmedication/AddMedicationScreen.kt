@@ -15,10 +15,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,10 +29,43 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.newtrackmed.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMedicationScreen(){
+    val addMedViewModel: AddMedicationViewModel = viewModel(
+        factory = AddMedicationViewModel.Factory
+    )
+
+    val screenData = addMedViewModel.addMedScreenData
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(title = { Text(text = "AddMedication")})
+        },
+        content = {innerPadding ->
+            AddMedDetailsScreen(
+                nameQuestionData = screenData.nameQuestionData,
+                strengthQuestionData = screenData.strengthQuestionData,
+                medTypeQuestionData = screenData.medTypeQuestionData,
+                asNeededQuestionData = screenData.asNeededQuestionData,
+                onNameValueChange = {newValue ->
+                    addMedViewModel.onMedNameChanged(newValue) },
+                onStrengthValueChange = {newValue ->
+                    addMedViewModel.onStrengthValueChanged(newValue) },
+                onSelectTypeClicked = { /*TODO*/ },
+                onAsNeededOptionSelected = {newValue ->
+                    addMedViewModel.onAsNeededClicked(newValue)
+                },
+                onSaveMedDetailsClicked = {addMedViewModel.onSaveMedDetailsClicked()},
+                modifier = Modifier.padding(innerPadding)
+            )
+
+        }
+    )
+
 
 }
 
@@ -92,20 +127,20 @@ fun AddMedicationQuestion(
 }
 //https://stackoverflow.com/questions/69048715/is-there-a-way-in-jetpack-compose-to-retreive-the-real-string-value-of-a-string
 //https://stackoverflow.com/questions/74458452/jetpack-compose-handling-both-a-string-and-string-resource-identifier-for-a-text
-@Composable
-fun AddMedFormQuestion(
-    onSelectFormClicked: () -> Unit
-){
-    AddMedicationQuestion(
-        icon = Icons.Filled.Medication,
-        title = R.string.enter_med_form,
-    ) {
-        NavigateToDialogCard(
-            text = (R.string.enter_med_form_placeholder),
-            onClick = onSelectFormClicked
-        )
-    }
-}
+//@Composable
+//fun AddMedFormQuestion(
+//    onSelectFormClicked: () -> Unit
+//){
+//    AddMedicationQuestion(
+//        icon = Icons.Filled.Medication,
+//        title = R.string.enter_med_form,
+//    ) {
+//        NavigateToDialogCard(
+//            text = (R.string.enter_med_form_placeholder),
+//            onClick = onSelectFormClicked
+//        )
+//    }
+//}
 
 
 @OptIn(ExperimentalMaterial3Api::class)

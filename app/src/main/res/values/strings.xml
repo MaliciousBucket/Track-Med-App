@@ -12,6 +12,8 @@
     <string name="notes">Notes</string>
     <string name="instructions">Instructions</string>
 
+    <string name="save_medication_details">Save Medication Details</string>
+
 <!--    Dose Status-->
 
     <string name="taken">Taken</string>
@@ -47,12 +49,23 @@
     <string name="enter_med_strength">Enter the strength of your Medication</string>
     <string name="enter_med_strength_placeholder">Enter Strength</string>
 
-    <string name="enter_med_form">What form is your Medication in?</string>
-    <string name="enter_med_form_placeholder">Enter Form</string>
+    <string name="enter_med_type">What type of Medication is it?</string>
+    <string name="enter_med_type_placeholder">Select Type</string>
 
-    <string name="enter_med_as_needed_or_schedules">How do you take your Medication?</string>
+    <string name="enter_med_as_needed_or_scheduled">How are doses taken?</string>
     <string name="as_needed">As Needed</string>
     <string name="scheduled">Scheduled</string>
+
+    <string name="enter_med_time">What time do you take this Medication?</string>
+    <string name="enter_med_time_placeholder">Select Time</string>
+    <string name="nav_to_enter_time">Navigate to Medication timing selection</string>
+
+    <string name="enter_med_frequency">How often do you take this Medication?</string>
+    <string name="enter_med_frequency_placeholder">Select Frequency</string>
+    <string name="nav_to_select_frequency">Navigate to medication frequency selection</string>
+
+    <string name="enter_med_dosage">How many are taken each dose?</string>
+    <string name="enter_med_dosage_placeholder">Enter Dosage</string>
 
 <!--    MyMedications-->
     <string name="medication_details">Medication Details</string>
@@ -79,4 +92,12 @@
     <string name="loading_as_needed_error">There was an error determining if this Medication is taken As Needed</string>
 <!--    Icons-->
     <string name="error_icon_description">Error</string>
+
+    <string name="navigate_to_select_med_type">Navigate to select your medication\'s type</string>
+
+<!--    Questions-->
+    <string name="add_medication_name">What is the name of your Medication?</string>
+
+<!--    Add medication Question Placeholders-->
+    <string name="add_med_type_placeholder">Select Form</string>
 </resources>

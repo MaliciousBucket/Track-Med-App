@@ -456,6 +456,7 @@ fun MedStartEndDateDetailsCard(
             modifier = Modifier.padding(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
+            //TODO: Change to space by and remove padding
         ){
             Column(
                 modifier = Modifier.weight(1f)

@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.newtrackmed.ui.feature.addmedication.AddMedicationScreen
 import com.example.newtrackmed.ui.feature.home.HomeScreen
 import com.example.newtrackmed.ui.feature.mymedications.MyMedicationsScreen
 import com.example.newtrackmed.ui.feature.report.TestDonut
@@ -33,7 +34,8 @@ class MainActivity : ComponentActivity() {
 
 //                MyMedicationsScreen()
                 //testDonut()
-                TestDonut()
+//                TestDonut()
+                AddMedicationScreen()
             }
         }
     }
