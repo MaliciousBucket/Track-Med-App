@@ -256,6 +256,25 @@ fun AddMedSaveButton(
     }
 }
 
+@Composable
+fun AddMedDialogSaveButton(
+    @StringRes text: Int,
+    onClick: () -> Unit
+){
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF6DD58C)
+        ),
+        shape = RoundedCornerShape(0.dp),
+        onClick = { onClick() }) {
+        Text(text = stringResource(text))
+
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable

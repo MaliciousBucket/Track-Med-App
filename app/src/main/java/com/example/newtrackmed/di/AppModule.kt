@@ -12,6 +12,8 @@ import com.example.newtrackmed.data.repository.DoseRepository
 import com.example.newtrackmed.data.repository.FrequencyRepository
 import com.example.newtrackmed.data.repository.MedicationDoseCompositeRepository
 import com.example.newtrackmed.data.repository.MedicationRepository
+import com.example.newtrackmed.ui.feature.addmedication.ContextResourceWrapper
+import com.example.newtrackmed.ui.feature.addmedication.ResourceWrapper
 import kotlinx.coroutines.CoroutineScope
 
 interface AppModule {
@@ -27,6 +29,8 @@ interface AppModule {
     val medicationRepository: MedicationRepository
     val frequencyRepository: FrequencyRepository
     val compositeRepository: MedicationDoseCompositeRepository
+
+    val resourceWrapper: ResourceWrapper
 
 }
 
@@ -77,6 +81,10 @@ class AppModuleImpl(
             frequencyDao,
             coroutineScope
         )
+    }
+
+    override val resourceWrapper: ResourceWrapper by lazy {
+        ContextResourceWrapper(appContext)
     }
 
 

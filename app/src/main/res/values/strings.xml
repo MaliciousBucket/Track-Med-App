@@ -6,8 +6,10 @@
 <!--    Common-->
     <string name="cancel">Cancel</string>
     <string name="edit">Edit</string>
+    <string name="save">Save</string>
     <string name="navigate_back">Navigate back</string>
     <string name="expand_or_collapse">Expand or collapse</string>
+
 
     <string name="notes">Notes</string>
     <string name="instructions">Instructions</string>
@@ -29,6 +31,12 @@
     <string name="un_skip">UnSkip</string>
     <string name="reschedule">Reschedule</string>
 
+<!--    Frequency Options-->
+    <string name="daily">Daily</string>
+    <string name="every_other_day">Every Other Day</string>
+    <string name="every_x_days">Every _X_ Days</string>
+    <string name="days_of_the_week">Days of the Week</string>
+    <string name="days_of_the_month">Days of the Month</string>
 <!--    Top App Bar-->
     <string name="select_date">Select Date</string>
     <string name="add_dose_med">Add a dose or medication</string>
@@ -43,11 +51,18 @@
 <!--    MyMedications Top App Bar-->
     <string name="add_dose_for_this_med">Add a new dose for this Medication</string>
 <!--    Add Medication Questions-->
+    <string name="custom">Custom</string>
+
     <string name="enter_med_name">Enter the name of your Medication</string>
     <string name="enter_med_name_placeholder">Medication Name</string>
 
     <string name="enter_med_strength">Enter the strength of your Medication</string>
     <string name="enter_med_strength_placeholder">Enter Strength</string>
+
+    <string name="enter_dose_unit">What unit is used to measure this Medication?</string>
+    <string name="enter_dose_unit_placeholder">Select Unit of Measurement</string>
+    <string name="nav_select_dose_unit">Navigate to dose unit selection</string>
+    <string name="select_dose_unit">Select the unit of measurement for this Medication</string>
 
     <string name="enter_med_type">What type of Medication is it?</string>
     <string name="enter_med_type_placeholder">Select Type</string>
@@ -67,6 +82,11 @@
     <string name="enter_med_dosage">How many are taken each dose?</string>
     <string name="enter_med_dosage_placeholder">Enter Dosage</string>
 
+<!--    Add Medication Dialog -->
+    <string name="nav_back_med_details">Navigate back to adding the new medication\'s details</string>
+    <string name="nav_back_dose_details">Navigate back to adding Dose\'s details</string>
+
+    <string name="frequency_dialog_title">Select the frequency at which you take this Medication</string>
 <!--    MyMedications-->
     <string name="medication_details">Medication Details</string>
     <string name="notes_and_instructions">Notes and Instructions</string>
@@ -100,4 +120,58 @@
 
 <!--    Add medication Question Placeholders-->
     <string name="add_med_type_placeholder">Select Form</string>
+
+    <!-- Dose Units -->
+    <string name="mg">mg</string>
+    <string name="g">g</string>
+    <string name="mcg">mcg</string>
+    <string name="kg">Kg</string>
+    <string name="l">L</string>
+    <string name="ml">mL</string>
+    <string name="iu">IU</string>
+    <string name="mmol">mmol</string>
+    <string name="mol">mol</string>
+    <string name="meq">mEq</string>
+    <string name="u">U</string>
+    <string name="cc">cc</string>
+    <string name="oz">oz</string>
+    <string name="tsp">tsp</string>
+    <string name="tbsp">tbsp</string>
+
+    <!-- Extended Names for Dose Units -->
+    <string name="milligram">Milligram</string>
+    <string name="gram">Gram</string>
+    <string name="microgram">Microgram</string>
+    <string name="kilogram">Kilogram</string>
+    <string name="liter">Liter</string>
+    <string name="milliliter">Milliliter</string>
+    <string name="international_unit">International Unit</string>
+    <string name="millimole">Millimole</string>
+    <string name="mole">Mole</string>
+    <string name="milliequivalent">Milliequivalent</string>
+    <string name="unit">Unit</string>
+    <string name="cubic_centimeter">Cubic Centimeter</string>
+    <string name="ounce">Ounce</string>
+    <string name="teaspoon">Teaspoon</string>
+    <string name="tablespoon">Tablespoon</string>
+
+    <!-- Medication Types -->
+    <string name="pill">Pill</string>
+    <string name="sachet">Sachet</string>
+    <string name="tablet">Tablet</string>
+    <string name="spray">Spray</string>
+    <string name="topical">Topical</string>
+    <string name="capsule">Capsule</string>
+    <string name="liquid">Liquid</string>
+    <string name="gel">Gel</string>
+    <string name="injection">Injection</string>
+    <string name="patch">Patch</string>
+    <string name="inhaler">Inhaler</string>
+    <string name="cream">Cream</string>
+    <string name="ointment">Ointment</string>
+    <string name="suppository">Suppository</string>
+    <string name="lozenge">Lozenge</string>
+
+
+
 </resources>

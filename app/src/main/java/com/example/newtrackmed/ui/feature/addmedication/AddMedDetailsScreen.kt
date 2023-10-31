@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,10 +41,12 @@ import com.example.newtrackmed.ui.theme.NewTrackMedTheme
 fun AddMedDetailsScreen(
     nameQuestionData: MedNameQuestionData,
     strengthQuestionData: StrengthQuestionData,
+    doseUnitQuestionData: DoseUnitQuestionData,
     medTypeQuestionData: MedTypeQuestionData,
     asNeededQuestionData: AsNeededQuestionData,
     onNameValueChange: (String) -> Unit,
     onStrengthValueChange: (String) -> Unit,
+    onSelectDoseUnitClicked: () -> Unit,
     onSelectTypeClicked: () -> Unit,
     onAsNeededOptionSelected: (Boolean) -> Unit,
     onSaveMedDetailsClicked: () -> Unit,
@@ -67,22 +70,37 @@ fun AddMedDetailsScreen(
     ) {
         MedNameQuestion(
             titleResourceId = R.string.enter_med_name,
-            questionData = nameQuestionData,
+            input = nameQuestionData.nameAnswer,
+            isError = nameQuestionData.isNameError,
+            errorMessage = nameQuestionData.nameErrorMessage,
             onValueChange = onNameValueChange
         )
         MedStrengthQuestion(
             titleResourceId = R.string.enter_med_strength,
-            questionData = strengthQuestionData,
+            input = strengthQuestionData.strengthAnswer,
+            isError = strengthQuestionData.isStrengthError,
+            errorMessage = strengthQuestionData.strengthErrorMessage,
             onValueChange = onStrengthValueChange
         )
+
+        DosageUnitQuestion(
+            titleResourceId = R.string.enter_dose_unit,
+            answer = doseUnitQuestionData.doseUnitAnswer
+        ) {
+            onSelectDoseUnitClicked()
+        }
+
         MedTypeQuestion(
             titleResourceId = R.string.enter_med_type,
-            questionData = medTypeQuestionData) {
+            answer= medTypeQuestionData.medTypeAnswer,
+//            questionData = medTypeQuestionData) {
+        ){
             onSelectTypeClicked()
         }
         AsNeededQuestion(
             titleResourceId = R.string.enter_med_as_needed_or_scheduled,
-            questionData = asNeededQuestionData,
+            selectedIndex = asNeededQuestionData.selectedIndex.value,
+            options = asNeededQuestionData.options,
             onOptionSelected = onAsNeededOptionSelected
         )
         AddMedSaveButton(text = R.string.save_medication_details, isEnabled = true) {
@@ -91,92 +109,122 @@ fun AddMedDetailsScreen(
     }
 }
 //R.string.enter_med_name
-//@Composable
-//fun MedNameQuestion(
-//    @StringRes titleResourceId: Int,
-//    input: String,
-//    isError: Boolean,
-//    errorMessage: String,
-//    onValueChange: (String) -> Unit
-//){
-//    AddMedicationTextQuestion(
-//        titleResourceId = R.string.enter_med_name,
-//        placeholderResourceId = R.string.enter_med_name_placeholder,
-//        input = input,
-//        iconImage = Icons.Filled.Edit,
-//        keyboardType = KeyboardType.Text,
-//        isError = isError,
-//        errorMessage = errorMessage,
-//        onValueChange = onValueChange
-//    )
-//}
-
 @Composable
 fun MedNameQuestion(
     @StringRes titleResourceId: Int,
-    questionData: MedNameQuestionData,
+    input: String,
+    isError: Boolean,
+    errorMessage: String,
     onValueChange: (String) -> Unit
 ){
     AddMedicationTextQuestion(
-        titleResourceId = titleResourceId,
+        titleResourceId = R.string.enter_med_name,
         placeholderResourceId = R.string.enter_med_name_placeholder,
-        input = questionData.nameAnswer.value,
+        input = input,
         iconImage = Icons.Filled.Edit,
         keyboardType = KeyboardType.Text,
-        isInputError = questionData.isNameError.value,
-        errorMessage = questionData.nameErrorMessage.value,
+        isInputError = isError,
+        errorMessage = errorMessage,
         onValueChange = onValueChange
     )
 }
-//R.string.enter_med_strength
+
 //@Composable
-//fun MedStrengthQuestion(
+//fun MedNameQuestion(
 //    @StringRes titleResourceId: Int,
-//    input: String,
-//    isError: Boolean,
-//    errorMessage: String,
+//    questionData: MedNameQuestionData,
 //    onValueChange: (String) -> Unit
 //){
 //    AddMedicationTextQuestion(
 //        titleResourceId = titleResourceId,
-//        placeholderResourceId = R.string.enter_med_strength_placeholder,
-//        input = input,
-//        iconImage = Icons.Filled.FitnessCenter,
-//        keyboardType = KeyboardType.NumberPassword,
-//        isError = isError,
-//        errorMessage = errorMessage,
+//        placeholderResourceId = R.string.enter_med_name_placeholder,
+//        input = questionData.nameAnswer.value,
+//        iconImage = Icons.Filled.Edit,
+//        keyboardType = KeyboardType.Text,
+//        isInputError = questionData.isNameError.value,
+//        errorMessage = questionData.nameErrorMessage.value,
+//        onValueChange = onValueChange
+//    )
+//
+//    AddMedicationTextQuestion(
+//        titleResourceId = titleResourceId,
+//        placeholderResourceId = R.string.enter_med_name_placeholder,
+//        input = questionData.nameAnswer,
+//        iconImage = Icons.Filled.Edit,
+//        keyboardType = KeyboardType.Text,
+//        isInputError = questionData.isNameError,
+//        errorMessage = questionData.nameErrorMessage,
 //        onValueChange = onValueChange
 //    )
 //}
+//R.string.enter_med_strength
 @Composable
 fun MedStrengthQuestion(
     @StringRes titleResourceId: Int,
-    questionData: StrengthQuestionData,
+    input: String,
+    isError: Boolean,
+    errorMessage: String,
     onValueChange: (String) -> Unit
 ){
     AddMedicationTextQuestion(
         titleResourceId = titleResourceId,
         placeholderResourceId = R.string.enter_med_strength_placeholder,
-        input = questionData.strengthAnswer.value,
+        input = input,
         iconImage = Icons.Filled.FitnessCenter,
         keyboardType = KeyboardType.NumberPassword,
-        isInputError = questionData.isStrengthError.value,
-        errorMessage = questionData.strengthErrorMessage.value,
+        isInputError = isError,
+        errorMessage = errorMessage,
         onValueChange = onValueChange
     )
 }
+//@Composable
+//fun MedStrengthQuestion(
+//    @StringRes titleResourceId: Int,
+//    questionData: StrengthQuestionData,
+//    onValueChange: (String) -> Unit
+//){
+//    AddMedicationTextQuestion(
+//        titleResourceId = titleResourceId,
+//        placeholderResourceId = R.string.enter_med_strength_placeholder,
+//        input = questionData.strengthAnswer.value,
+//        iconImage = Icons.Filled.FitnessCenter,
+//        keyboardType = KeyboardType.NumberPassword,
+//        isInputError = questionData.isStrengthError.value,
+//        errorMessage = questionData.strengthErrorMessage.value,
+//        onValueChange = onValueChange
+//    )
+//}
 //R.string.enter_med_type
+
+@Composable
+fun DosageUnitQuestion(
+    @StringRes titleResourceId: Int,
+    answer: String,
+    onSelectDoseUnitClicked: () -> Unit,
+){
+    MedicationNavQuestion(
+        titleResourceId = titleResourceId,
+        placeholderResourceId = R.string.enter_dose_unit_placeholder,
+        iconDescriptionResourceId = R.string.nav_select_dose_unit,
+        answer = answer,
+        iconImage = Icons.Default.Scale
+    ) {
+        onSelectDoseUnitClicked()
+    }
+}
+
 @Composable
 fun MedTypeQuestion(
     @StringRes titleResourceId: Int,
-    questionData: MedTypeQuestionData,
+    answer: MedTypeOption?,
+//    questionData: MedTypeQuestionData,
     onSelectTypeClicked: () -> Unit
 ){
     MedicationNavQuestion(
         titleResourceId = titleResourceId,
         placeholderResourceId = R.string.add_med_type_placeholder,
         iconDescriptionResourceId = R.string.navigate_to_select_med_type,
-        answer = questionData.medTypeAnswer?.text ?: "",
+        answer = answer?.let { stringResource(id = it.name) } ?: "",
         iconImage = Icons.Filled.Medication
     ) {
         onSelectTypeClicked()
@@ -193,7 +241,8 @@ fun MedTypeQuestion(
 @Composable
 fun AsNeededQuestion(
     @StringRes titleResourceId: Int,
-    questionData: AsNeededQuestionData,
+    selectedIndex: Int,
+    options: List<AsNeededOption>,
     onOptionSelected: (Boolean) -> Unit
 ){
     Column(
@@ -205,7 +254,9 @@ fun AsNeededQuestion(
             iconImage = Icons.Filled.Schedule
         )
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(0.dp),
         ) {
             Row(
@@ -216,13 +267,13 @@ fun AsNeededQuestion(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SingleChoiceSegmentedButtonRow(){
-                    questionData.options.forEachIndexed { index, option ->
+                    options.forEachIndexed { index, option ->
                         SegmentedButton(
-                            selected = index == questionData.selectedIndex.value,
+                            selected = index == selectedIndex,
                             onClick = { onOptionSelected(option.value)},
                             shape = SegmentedButtonDefaults.itemShape(
                                 index = index,
-                                count = questionData.options .size
+                                count = options.size
                             )
                         ) {
                             Text(text = stringResource(option.labelResourceId))
@@ -231,7 +282,6 @@ fun AsNeededQuestion(
 
                 }
             }
-
         }
     }
 }
@@ -247,7 +297,7 @@ fun MedDetailsScreenPreview() {
             verticalArrangement = Arrangement.Center
             ) {
             val testData = MedNameQuestionData()
-            MedNameQuestion(titleResourceId = R.string.enter_med_name, questionData = testData, onValueChange ={} )
+
         }
 
     }
