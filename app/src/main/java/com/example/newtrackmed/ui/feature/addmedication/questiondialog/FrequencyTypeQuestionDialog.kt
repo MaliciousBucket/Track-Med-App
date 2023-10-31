@@ -14,13 +14,15 @@ import com.example.newtrackmed.ui.feature.addmedication.QuestionDialogWrapper
 
 @Composable
 fun FrequencyTypeDialogContent(
+    @StringRes title: Int,
+    @StringRes backButtonDescription: Int,
     selectedFrequency: FrequencyType?,
+//    frequencyOptions: List<FrequencyOption>,
     onDailyClicked: () -> Unit,
     onEveryOtherDayClicked: () -> Unit,
     onEveryXDaysClicked: () -> Unit,
     onWeekDaysClicked: () -> Unit,
     onMonthDaysClicked: () -> Unit,
-
     onBackPressed: () -> Unit
 ){
 
@@ -30,9 +32,9 @@ fun FrequencyTypeDialogContent(
     val weekDays = FrequencyOption(R.string.days_of_the_week, FrequencyType.WEEK_DAYS)
     val monthDays = FrequencyOption(R.string.days_of_the_month, FrequencyType.MONTH_DAYS)
     QuestionDialogWrapper(
-        title = R.string.frequency_dialog_title,
+        title = title,
         icon = Icons.Default.CalendarToday,
-        backButtonDescription = R.string.nav_back_dose_details,
+        backButtonDescription = backButtonDescription,
         onSaveClicked = null,
         onBackPressed = { onBackPressed()}) {
 
@@ -65,6 +67,8 @@ fun FrequencyTypeDialogContent(
 
     }
 }
+
+
 
 data class FrequencyOption(
     @StringRes val name: Int,

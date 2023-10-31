@@ -31,7 +31,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.newtrackmed.R
 import com.example.newtrackmed.ui.feature.addmedication.questiondialog.DoseUnitDialogContent
+import com.example.newtrackmed.ui.feature.addmedication.questiondialog.FrequencyTypeDialogContent
+import com.example.newtrackmed.ui.feature.addmedication.questiondialog.MedDatesDialogContent
+import com.example.newtrackmed.ui.feature.addmedication.questiondialog.MedTimeDialogContent
+import com.example.newtrackmed.ui.feature.addmedication.questiondialog.MedTypeDialogContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,26 +68,41 @@ fun AddMedicationScreen(){
                             addMedViewModel.onStrengthValueChanged(newValue)
                         },
                         onSelectDoseUnitClicked = { addMedViewModel.onSelectDosageUnitClicked() },
-                        onSelectTypeClicked = { /*TODO*/ },
+                        onSelectTypeClicked = { addMedViewModel.onSelectMedTypeClicked() },
                         onAsNeededOptionSelected = { newValue ->
                             addMedViewModel.onAsNeededClicked(newValue)
                         },
                         onSaveMedDetailsClicked = { addMedViewModel.onSaveMedDetailsClicked() },
+                        isSaveButtonError = uiState.saveMedDetailsBtnState,
                         modifier = Modifier.padding(innerPadding)
                     )
+
+
                 }
 
-                is AddMedicationScreenState.DoseDetails -> {
-                    AddFrequencyDetailsScreen(
-                        timeAnswer = screenData.timeQuestionData.timeAnswer.value,
+                is AddMedicationScreenState.ScheduledDoseDetails -> {
+                    AddScheduledDetailsScreen(
+                        timeAnswer = screenData.timeQuestionData.timeAnswer,
+                        dateAnswer = screenData.dateQuestionData.formattedDateAnswer,
                         frequencyAnswer = "",
                         dosageAnswer = screenData.dosageQuestionData.dosageAnswer,
                         dosageErrorMessage = screenData.dosageQuestionData.dosageErrorMessage,
                         isDosageError = screenData.dosageQuestionData.isDosageError,
-                        onSelectTimeClicked = { /*TODO*/ },
+                        onSelectTimeClicked = { addMedViewModel.onsSelectTimeClicked() },
+                        onSelectDateClicked = {addMedViewModel.onSelectDatesClick()},
                         onSelectFrequencyClicked = { /*TODO*/ },
-                        onDosageValueChange = {}
+                        onDosageValueChange = {},
+                        modifier = Modifier.padding(innerPadding)
                     )
+                }
+                is AddMedicationScreenState.AsNeedDoseDetails -> {
+                    AsNeededDetailsScreen(
+                        dateAnswer = screenData.dateQuestionData.formattedDateAnswer,
+                        dosageAnswer = screenData.dosageQuestionData.dosageAnswer,
+                        dosageErrorMessage = screenData.dosageQuestionData.dosageErrorMessage,
+                        isDosageError = screenData.dosageQuestionData.isDosageError,
+                        onDosageValueChange = {},
+                        onSelectDateClicked = { addMedViewModel.onSelectDatesClick() })
                 }
 
                 is AddMedicationScreenState.ScheduleReminder -> {
@@ -99,6 +119,7 @@ fun AddMedicationScreen(){
                                 is AddMedDialog.DoseUnitDialog -> {
                                     DoseUnitDialogContent(
 //                                        questionData = screenData.doseUnitQuestionData,
+                                        dialogTitleResourceId = (R.string.enter_dose_unit),
                                         doseUnitOptions = screenData.doseUnitQuestionData.doseUnitOptions,
                                         selectedIndex = screenData.doseUnitQuestionData.selectedIndex,
                                         customAnswer = screenData.doseUnitQuestionData.customAnswer,
@@ -114,20 +135,62 @@ fun AddMedicationScreen(){
                                 }
 
                                 is AddMedDialog.MedTypeDialog -> {
-
+                                    MedTypeDialogContent(
+                                        dialogTitleResourceId = R.string.enter_med_type,
+                                        typeOptions = screenData.medTypeQuestionData.medTypeOptions,
+                                        selectedIndex = screenData.medTypeQuestionData.selectedIndex,
+                                        customAnswer = screenData.medTypeQuestionData.customAnswer,
+                                        errorMessage = screenData.medTypeQuestionData.errorMessage,
+                                        customAnswerSelected = screenData.medTypeQuestionData.customAnswerSelected,
+                                        isCustomAnswerError = screenData.medTypeQuestionData.isCustomAnswerError,
+                                        onCustomAnswerChange = {addMedViewModel.onCustomMedTypeAnswerChanged(it)},
+                                        onCustomAnswerSelected = { addMedViewModel.onCustomMedTypeSelected() },
+                                        onItemSelected = {addMedViewModel.onMedTypeOptionSelected(it)},
+                                        onSaveClicked = { addMedViewModel.onSaveMedTypeClicked() },
+                                        onBackPressed = { addMedViewModel.onDialogDismissRequest() })
                                 }
 
 
                                 is AddMedDialog.FrequencyDialog -> {
+                                    FrequencyTypeDialogContent(
+                                        title = R.string.frequency_dialog_title,
+                                        backButtonDescription = R.string.nav_back_dose_details,
+                                        selectedFrequency = screenData.frequencyQuestionData.frequencyTypeAnswer,
+                                        onDailyClicked = { /*TODO*/ },
+                                        onEveryOtherDayClicked = { /*TODO*/ },
+                                        onEveryXDaysClicked = { /*TODO*/ },
+                                        onWeekDaysClicked = { /*TODO*/ },
+                                        onMonthDaysClicked = { /*TODO*/ }) {
 
+                                    }
                                 }
 
                                 is AddMedDialog.FirstReminderDialog -> {
 
                                 }
 
-                                is AddMedDialog.MedicationDatesDialog -> {
+                                is AddMedDialog.MedicationTimeDialog -> {
+                                    MedTimeDialogContent(
+                                        dialogTitleResourceId = R.string.med_time_dialog_title,
+                                        backButtonDescription = R.string.nav_back_dose_details,
+                                        initialTimeHour = null,
+                                        initialTimeMinute = null,
+                                        onSaveClicked = { hour, minute ->
+                                            addMedViewModel.onTimeSaved(hour, minute)
+                                        },
+                                        onBackPressed = { addMedViewModel.onDialogDismissRequest() }
+                                    )
+                                }
 
+                                is AddMedDialog.MedicationDatesDialog -> {
+                                    MedDatesDialogContent(
+                                        title = R.string.med_dates_dialog_title,
+                                        backButtonDescription = R.string.nav_back_dose_details,
+                                        onSaveClicked = {startDate, endDate ->
+                                            addMedViewModel.onDatesSaved(startDate, endDate)
+                                        },
+                                        onBackPressed = { addMedViewModel.onDialogDismissRequest() }
+                                    )
                                 }
 
                                 is AddMedDialog.SetReminderDialog -> {

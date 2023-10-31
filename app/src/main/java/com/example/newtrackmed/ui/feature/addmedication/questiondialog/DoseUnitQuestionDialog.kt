@@ -35,6 +35,7 @@ import com.example.newtrackmed.ui.theme.NewTrackMedTheme
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DoseUnitDialogContent(
+    @StringRes dialogTitleResourceId: Int,
 //    questionData: DoseUnitQuestionData,
     doseUnitOptions: List<DoseUnitOption>,
     selectedIndex: Int,
@@ -51,14 +52,15 @@ fun DoseUnitDialogContent(
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
 ){
+    //TODO: Make this take the title as a aparemeter so it can be used for editing
     QuestionDialogWrapper(
-        title = R.string.enter_dose_unit,
+        title = dialogTitleResourceId,
         icon = Icons.Default.Scale,
         backButtonDescription = R.string.nav_back_med_details,
         onSaveClicked = onSaveClicked,
         onBackPressed = onBackPressed
     ) {
-        if(errorMessage.isNotEmpty() && isCustomAnswerError){
+        if(errorMessage.isNotEmpty()){
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = errorMessage,
@@ -80,9 +82,6 @@ fun DoseUnitDialogContent(
         LazyColumn(
             modifier = modifier
         ) {
-            item {
-
-            }
             itemsIndexed(doseUnitOptions) { index, item ->
                 DoseQuestionListItem(
                     value = stringResource(item.value),

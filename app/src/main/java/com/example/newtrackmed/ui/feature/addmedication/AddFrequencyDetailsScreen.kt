@@ -15,14 +15,16 @@ import com.example.newtrackmed.ui.feature.updateMedication.AddMedicationTextQues
 import com.example.newtrackmed.ui.feature.updateMedication.MedicationNavQuestion
 
 @Composable
-fun AddFrequencyDetailsScreen(
+fun AddScheduledDetailsScreen(
     modifier: Modifier = Modifier,
     timeAnswer: String,
+    dateAnswer: String,
     frequencyAnswer: String,
     dosageAnswer: String,
     dosageErrorMessage: String,
     isDosageError: Boolean,
     onSelectTimeClicked: () -> Unit,
+    onSelectDateClicked: () -> Unit,
     onSelectFrequencyClicked: () -> Unit,
     onDosageValueChange: (String) -> Unit
 ){
@@ -34,6 +36,12 @@ fun AddFrequencyDetailsScreen(
             titleResourceId = R.string.edit_med_time,
             answer = timeAnswer) {
             onSelectTimeClicked()
+        }
+        MedDateQuestion(
+            titleResourceId = R.string.enter_med_dates,
+            answer = dateAnswer
+        ) {
+            onSelectDateClicked()
         }
         MedFrequencyQuestion(
             titleResourceId = R.string.enter_med_frequency,
@@ -51,6 +59,38 @@ fun AddFrequencyDetailsScreen(
     }
 }
 
+@Composable
+fun AsNeededDetailsScreen(
+    dateAnswer: String,
+    dosageAnswer: String,
+    dosageErrorMessage: String,
+    isDosageError: Boolean,
+    onDosageValueChange: (String) -> Unit,
+    onSelectDateClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+){
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        MedDateQuestion(
+            titleResourceId = R.string.enter_med_dates,
+            answer = dateAnswer
+        ) {
+            onSelectDateClicked()
+        }
+        MedDosageQuestion(
+            titleResourceId = R.string.enter_med_dosage,
+            input = dosageAnswer,
+            errorMessage = dosageErrorMessage,
+            isError = isDosageError,
+            onValueChange = { newValue ->
+                onDosageValueChange(newValue)
+            }
+        )
+    }
+}
+
 //val formattedTimeAnswer: State<String> = derivedStateOf {
 //    _timeAnswer.value.format(DateTimeFormatter.ofPattern("h:mm a"))
 //}
@@ -58,6 +98,7 @@ fun AddFrequencyDetailsScreen(
 fun MedTimeQuestion(
     @StringRes titleResourceId: Int,
     answer: String,
+
     onSelectTimeClicked: () -> Unit
 ){
     MedicationNavQuestion(
@@ -70,6 +111,24 @@ fun MedTimeQuestion(
         onSelectTimeClicked()
     }
 }
+
+@Composable
+fun MedDateQuestion(
+    @StringRes titleResourceId: Int,
+    answer: String,
+    onSelectDateClicked: () -> Unit
+){
+    MedicationNavQuestion(
+        titleResourceId = titleResourceId,
+        placeholderResourceId = R.string.enter_med_dates_placeholder,
+        iconDescriptionResourceId = R.string.nav_to_enter_dates,
+        answer = answer,
+        iconImage = Icons.Filled.CalendarMonth
+    ) {
+        onSelectDateClicked()
+    }
+}
+
 
 @Composable
 fun MedFrequencyQuestion(

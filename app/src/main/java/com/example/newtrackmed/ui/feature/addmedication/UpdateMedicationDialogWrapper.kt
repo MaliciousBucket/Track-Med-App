@@ -89,7 +89,8 @@ fun QuestionDialogWrapper(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(4.dp, 0.dp, 4.dp, 4.dp)
+                    .padding(4.dp, 0.dp, 4.dp, 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row (
                     modifier = Modifier.fillMaxWidth(),
@@ -104,7 +105,7 @@ fun QuestionDialogWrapper(
                     }
                     if(onSaveClicked != null){
                         TextButton(onClick = { onSaveClicked()}) {
-                            Icon(imageVector = Icons.Filled.Check, contentDescription = null)
+//                            Icon(imageVector = Icons.Filled.Check, contentDescription = null)
                             Text(text = "Save")
                         }
                     }
@@ -211,18 +212,6 @@ data class MedQuestionOption(
     val hasAction: Boolean
 )
 
-val myListOfOption = listOf(
-    MedQuestionOption(text = "Item 1", value = "Value 1", isSelected = true, hasAction = false),
-    MedQuestionOption(text = "Item 2", value = "Value 2", isSelected = false, hasAction = true),
-    MedQuestionOption(text = "Item 3", value = "Value 3", isSelected = false, hasAction = false),
-)
-
-sealed class testSelection(
-    title: String,
-
-){
-
-}
 @Composable
 fun DoseQuestionListItem(
     value: String,
@@ -260,7 +249,7 @@ fun DoseQuestionListItem(
             verticalAlignment = Alignment.CenterVertically
         ){
             Box(modifier = Modifier.padding(8.dp)){
-                RadioButton(selected = isSelected, onClick = { null })
+                RadioButton(selected = isSelected, onClick = { onOptionSelected() })
             }
 
             Row (
@@ -396,7 +385,7 @@ fun MedQuestionListOption(
             verticalAlignment = Alignment.CenterVertically
         ){
             Box(modifier = Modifier.padding(8.dp)){
-                RadioButton(selected = isSelected, onClick = { null })
+                RadioButton(selected = isSelected, onClick = { onOptionSelected() })
             }
             Text(
                 modifier = Modifier.weight(1f),
@@ -447,7 +436,7 @@ fun MedQuestionNavOption(
             verticalAlignment = Alignment.CenterVertically
         ){
             Box(modifier = Modifier.padding(8.dp)){
-                RadioButton(selected = isSelected, onClick = { null })
+                RadioButton(selected = isSelected, onClick = { onOptionClicked() })
             }
             Spacer(modifier = Modifier.width(8.dp))
             Text(

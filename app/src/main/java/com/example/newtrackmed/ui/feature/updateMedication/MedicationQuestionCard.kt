@@ -1,12 +1,11 @@
 package com.example.newtrackmed.ui.feature.updateMedication
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,11 +18,9 @@ import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -82,8 +79,6 @@ fun MedicationQuestionCard(
     }
 }
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMedNavCard(
@@ -106,7 +101,9 @@ fun AddMedNavCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { onNavCardClicked() },
                 value = text,
                 onValueChange = {},
                 placeholder = {
@@ -239,23 +236,25 @@ fun AddMedicationTextQuestion(
 @Composable
 fun AddMedSaveButton(
     @StringRes text: Int,
-    isEnabled: Boolean,
+    isError: Boolean,
     onClick: () -> Unit
 ){
+    val normalColor = Color(0xFF6DD58C)
+    val errorColor = MaterialTheme.colorScheme.errorContainer
+    val buttonColor = if (isError) errorColor else normalColor
+
     Button(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF6DD58C)
+            containerColor = buttonColor
         ),
         shape = RoundedCornerShape(0.dp),
         onClick = { onClick() }) {
         Text(text = stringResource(text))
-        
     }
 }
-
 @Composable
 fun AddMedDialogSaveButton(
     @StringRes text: Int,
@@ -291,7 +290,7 @@ fun MedicationQuestionCardPreview(){
                 onNavCardClicked = {}
             )
 
-            AddMedSaveButton(text = R.string.save_medication_details, isEnabled = true) {
+            AddMedSaveButton(text = R.string.save_medication_details, isError = true) {
                 
             }
         }

@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -50,16 +49,8 @@ fun AddMedDetailsScreen(
     onSelectTypeClicked: () -> Unit,
     onAsNeededOptionSelected: (Boolean) -> Unit,
     onSaveMedDetailsClicked: () -> Unit,
+    isSaveButtonError: Boolean,
     modifier: Modifier = Modifier,
-
-//    nameAnswer: String,
-//    strengthAnswer: String,
-//    asNeededIndex: Int,
-//    isNameError: Boolean,
-//    isStrengthError: Boolean,
-
-
-
 ){
     Column(
         modifier = modifier
@@ -103,7 +94,7 @@ fun AddMedDetailsScreen(
             options = asNeededQuestionData.options,
             onOptionSelected = onAsNeededOptionSelected
         )
-        AddMedSaveButton(text = R.string.save_medication_details, isEnabled = true) {
+        AddMedSaveButton(text = R.string.save_medication_details, isError = true) {
             onSaveMedDetailsClicked()
         }
     }
@@ -216,15 +207,15 @@ fun DosageUnitQuestion(
 @Composable
 fun MedTypeQuestion(
     @StringRes titleResourceId: Int,
-    answer: MedTypeOption?,
+    answer: String,
 //    questionData: MedTypeQuestionData,
     onSelectTypeClicked: () -> Unit
 ){
     MedicationNavQuestion(
         titleResourceId = titleResourceId,
-        placeholderResourceId = R.string.add_med_type_placeholder,
+        placeholderResourceId = R.string.enter_med_type_placeholder,
         iconDescriptionResourceId = R.string.navigate_to_select_med_type,
-        answer = answer?.let { stringResource(id = it.name) } ?: "",
+        answer = answer,
         iconImage = Icons.Filled.Medication
     ) {
         onSelectTypeClicked()

@@ -21,4 +21,27 @@ Edit Screen (static except for change of med)
 Various edit screens (goes with add medication)
 Recent Doses state
 
+
+
+
+
+
+TODO:
+Make full nav question clickable - DONE
+Make radio button clickable - DONE
+Change form answer placeholder - DONE
+Frequency picker
+date picker - Done
+days of the week picker
+time picker
+doage input
+Edit dialogue
+make future doses nat usable
+Reports
+Recent dose views
+research report
+change theme
+adjust colours
+calendar dropdown
+
 */
