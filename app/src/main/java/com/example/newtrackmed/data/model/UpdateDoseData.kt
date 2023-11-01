@@ -73,7 +73,8 @@ enum class UpdateDoseActions{
     MISSED,
     SKIPPED,
     RESCHEDULED,
-    TAKE
+    TAKE,
+    FUTURE
 }
 
 fun DoseStatus?.toUpdateDoseActions(): UpdateDoseActions {

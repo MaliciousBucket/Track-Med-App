@@ -33,9 +33,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.newtrackmed.R
 import com.example.newtrackmed.data.model.DoseChipStatus
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.ui.component.BottomNavBar
+import com.example.newtrackmed.ui.component.ErrorScreenDisplay
+import com.example.newtrackmed.ui.component.LoadingScreenDisplay
 
 @Composable
 fun HomeScreen(){
@@ -44,7 +47,7 @@ fun HomeScreen(){
     )
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
-    val dateState by homeViewModel.selectedDate.collectAsStateWithLifecycle()
+
 
     Scaffold (
         topBar = {
@@ -70,11 +73,19 @@ fun HomeScreen(){
         },
     )
     { innerPadding ->
+
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxWidth()
         ) {
+            DateIndicator(
+                selectedDate = uiState.selectedDate,
+                onPreviousClick = { homeViewModel.onPreviousDateClicked() },
+                onNextClick = {homeViewModel.onNextDateClicked()},
+                onDateClicked = {homeViewModel.onDateChange(it)},
+            )
 
             val modifier = Modifier.padding(innerPadding)
             when (uiState.viewData) {
@@ -90,11 +101,11 @@ fun HomeScreen(){
                 }
 
                 DoseDisplayUIState.Loading -> {
-
+                    LoadingScreenDisplay(title = R.string.home_screen_loading_message)
                 }
 
                 DoseDisplayUIState.Error -> {
-
+                    ErrorScreenDisplay(title = R.string.loading_daily_doses_error)
                 }
                 else -> {}
             }
@@ -108,6 +119,7 @@ fun HomeScreen(){
                             onUnTakeClick = { homeViewModel.onUnTakeClicked() },
                             onSkipClick = { homeViewModel.onSkippedClicked() },
                             onMissedClick = { homeViewModel.onMissedClicked() },
+                            onTakeNowClick = {homeViewModel.onTakeNowClicked()},
                             onCancelClick = { homeViewModel.onCancelDialogClicked() },
                             onEditClick = { /*TODO*/ }) {
 
@@ -117,25 +129,6 @@ fun HomeScreen(){
                 is UpdateDoseDialogUIState.Hidden -> {
                 }
             }
-            Button(
-                onClick = { homeViewModel.onNextDateClicked() },
-                ) {
-                Text(text = "Next Date")
-            }
-            Button(
-                onClick = { homeViewModel.onPreviousDateClicked() },
-                ) {
-                Text(text = "Previous Date")
-            }
-            OutlinedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-            ) {
-                Text(text = "Current Date State: $dateState")
-            }
-
-            Spacer(modifier = Modifier.height(50.dp))
 
         }
     }

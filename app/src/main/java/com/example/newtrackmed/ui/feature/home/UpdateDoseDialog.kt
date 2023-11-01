@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
+import androidx.compose.material.icons.filled.CalendarViewDay
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
@@ -54,6 +55,7 @@ fun UpdateDoseDialog(
     onUnTakeClick: () -> Unit,
     onSkipClick: () -> Unit,
     onMissedClick: () -> Unit,
+    onTakeNowClick: () -> Unit,
     onCancelClick: () -> Unit,
     onEditClick: () -> Unit,
     onCancelEditClick: () -> Unit
@@ -97,6 +99,7 @@ fun UpdateDoseDialog(
                     onUnTakeClick = { onUnTakeClick() },
                     onSkipClick = { onSkipClick() },
                     onMissedClick = { onMissedClick() },
+                    onTakeNowClick = { onTakeNowClick()},
                     onCancelClick = { onCancelClick() },
                     onEditClick = { onEditClick() }) {
 
@@ -116,6 +119,7 @@ fun DisplayUpdateDoseDialogActions(
     onUnTakeClick: () -> Unit,
     onSkipClick: () -> Unit,
     onMissedClick: () -> Unit,
+    onTakeNowClick: () -> Unit,
     onCancelClick: () -> Unit,
     onEditClick: () -> Unit,
     onCancelEditClick: () -> Unit
@@ -169,6 +173,12 @@ fun DisplayUpdateDoseDialogActions(
 
             UpdateDoseActions.RESCHEDULED -> {
 
+            }
+
+            UpdateDoseActions.FUTURE -> {
+                TakeNowButton {
+                    onTakeNowClick()
+                }
             }
         }
     }
@@ -237,6 +247,16 @@ fun CancelIconButton(onCancelClick: () -> Unit){
             onCancelClick()
         }
     )
+}
+
+@Composable
+fun TakeNowButton(onTakeNowClick: () -> Unit){
+    IconButtonWithText(
+        icon = Icons.Filled.CalendarViewDay,
+        text = R.string.take_now
+    ) {
+        onTakeNowClick()
+    }
 }
 
 

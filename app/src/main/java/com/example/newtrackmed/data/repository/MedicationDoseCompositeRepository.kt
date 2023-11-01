@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -99,13 +100,13 @@ class MedicationDoseCompositeRepository(
 
     suspend fun getTestData() = withContext(Dispatchers.IO) {
         val medicationList = _allMedications.value
-        val newData = medicationList.map { it.asDisplayDoseViewData() }
+        val newData = medicationList.map { it.asDisplayDoseViewData(null) }
         _viewData.value = newData
     }
 
      fun testMeds() : Flow<List<DoseViewData>> {
         return medicationDao.getAllActiveMedications().map { medications ->
-            medications.map { it.asDisplayDoseViewData() }.onEach {
+            medications.map { it.asDisplayDoseViewData(null) }.onEach {
                 Log.d("Debug Composite", "Returning: $medications")
             }
         }
@@ -168,15 +169,13 @@ class MedicationDoseCompositeRepository(
     }
 
     fun createTestData( selectedDate: LocalDateTime): Flow<List<DoseViewData>> {
-        Log.d("All Doses for Today", "${_dosesForData.value}")
         val selectedLocalDate = selectedDate.toLocalDate()
         val dosesForDate = doseDao.getDosesForLocalDate(selectedLocalDate)
 
         return flow {
             coroutineScope.launch {
                 filterLogic(selectedDate).flowOn(Dispatchers.IO).collect { filteredIds ->
-                    val intIds = filteredIds.mapNotNull { it.toInt() }.toSet()
-                    Log.d("Debug Filtering", "Ids that made it: $intIds")
+                    val intIds = filteredIds.mapNotNull { it }.toSet()
                     _medIdsForDate.update { intIds }
                 }
             }
@@ -195,7 +194,7 @@ class MedicationDoseCompositeRepository(
                         val innerList = mutableListOf<DoseViewData>()
 
                         if (correspondingFrequency?.asNeeded == true || correspondingDoses.isEmpty()) {
-                            innerList.add(medication.asDisplayDoseViewData())
+                            innerList.add(medication.asDisplayDoseViewData(selectedDate))
                         }
                         innerList.addAll(correspondingDoses.map { dose ->
                             DoseViewData(
@@ -207,7 +206,7 @@ class MedicationDoseCompositeRepository(
                                 dosageUnit = medication.dosageUnit,
                                 unitsTaken = medication.unitsTaken,
                                 doseTime = dose.createdTime.toLocalTime(),
-                                chipStatus = mapDoseStatusToChipStatus(dose.status)  // Assuming you have this function
+                                chipStatus = mapDoseStatusToChipStatus(dose.status)
                             )
                         })
 
@@ -305,23 +304,7 @@ class MedicationDoseCompositeRepository(
             doseDao.insertDose(doseEntity)
         }
     }
-    suspend fun TakeDose(updateDoseData: UpdateDoseData) {
-        withContext(Dispatchers.IO){
-            if (updateDoseData.doseId != null) {
-                doseDao.updateDoseStatus(updateDoseData.doseId, DoseStatus.TAKEN, LocalDateTime.now())
-            }
-            else {
-                doseDao.insertDose(DoseEntity(
-                    doseId = 0,
-                    medicationId = updateDoseData.medicationId,
-                    dosage = updateDoseData.dosage,
-                    createdTime = LocalDateTime.now(),
-                    status = DoseStatus.TAKEN
 
-                ))
-            }
-        }
-    }
 
     private val _allFlowMedications: Flow<List<MedicationEntity>> =
         medicationDao.getAllMedications().onEach { Log.d ("Debug Meds", "Collecting a med") }

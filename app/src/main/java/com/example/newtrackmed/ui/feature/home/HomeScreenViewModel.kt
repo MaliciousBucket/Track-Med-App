@@ -47,7 +47,8 @@ import java.time.LocalTime
 
 data class TestUIState(
     val viewData:DoseDisplayUIState,
-    val dateUiState: SelectedDateUIState,
+//    val dateUiState: SelectedDateUIState,
+    val selectedDate: LocalDateTime,
     val dialogUIState: UpdateDoseDialogUIState
 )
 
@@ -94,15 +95,10 @@ class HomeScreenViewModel(
 
     private val _selectedDate = MutableStateFlow(LocalDateTime.now())
 
-    val selectedDate = _selectedDate.asStateFlow()
-
-
-    fun refreshData() {
-
-    }
-
     fun onDateChange(newDate: LocalDateTime) {
-
+        viewModelScope.launch {
+            _selectedDate.update { newDate }
+        }
     }
 
     private val _flowMeds: Flow<Result<List<DoseViewData>>> =
@@ -112,11 +108,6 @@ class HomeScreenViewModel(
         .distinctUntilChanged().flatMapLatest { selectedDate ->
             compositeRepository.createTestData(selectedDate).asResult()
         }
-
-
-//    private val furtherTesting: Flow<Result<List<DoseViewData>>> = _selectedDate.flatMapLatest { selectedDate ->
-//        compositeRepository.createTestData(selectedDate).asResult()
-//    }
 
     private val _showDialogState = MutableStateFlow<UpdateDoseDialogUIState>(UpdateDoseDialogUIState.Hidden)
 
@@ -135,10 +126,11 @@ class HomeScreenViewModel(
 
     val uiState: StateFlow<TestUIState> = combine(
         furtherTesting,
+//        _selectedDate,
         _selectedDate,
         _showDialogState
 //        dialogState
-    ) { doseDataResult, currentData, dialogState  ->
+    ) { doseDataResult, currentDate, dialogState  ->
         val doseState: DoseDisplayUIState = when (doseDataResult) {
             is Result.Success -> DoseDisplayUIState.Success(doseDataResult.data)
             is Result.Loading -> DoseDisplayUIState.Loading
@@ -148,7 +140,8 @@ class HomeScreenViewModel(
             }
         }
 
-        val dateState: SelectedDateUIState = SelectedDateUIState.Success(LocalDateTime.now())
+        val dateState = _selectedDate.value
+       // val dateState: SelectedDateUIState = SelectedDateUIState.Success(LocalDateTime.now())
 
         val dialogState: UpdateDoseDialogUIState = when (dialogState) {
             is UpdateDoseDialogUIState.Success -> UpdateDoseDialogUIState.Success(_updateDoseData.value)
@@ -162,11 +155,10 @@ class HomeScreenViewModel(
     )
 }.stateIn(
     scope = viewModelScope,
-//    started = SharingStarted.WhileSubscribed(5000),
         started= SharingStarted.Lazily,
     initialValue = TestUIState(
         DoseDisplayUIState.Loading,
-        SelectedDateUIState.Success(LocalDateTime.now()),
+        LocalDateTime.now(),
         UpdateDoseDialogUIState.Hidden
     )
 )
@@ -191,10 +183,7 @@ fun onCardClicked(medicationId: Int, doseId: Int?) {
     }
 
     fun onTakeClicked() {
-//        viewModelScope.launch {
 
-//        }
-        //onCancelDialogClicked()
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
                 _showDialogState.update { UpdateDoseDialogUIState.Hidden }
@@ -277,15 +266,37 @@ fun onCardClicked(medicationId: Int, doseId: Int?) {
         }
     }
 
+    fun onTakeNowClicked() {
+        viewModelScope.launch {
+            viewModelScope.launch {
+                withContext(Dispatchers.Default) {
+                    _showDialogState.update { UpdateDoseDialogUIState.Hidden }
+                    val updateData = _updateDoseData.value
+                    if (updateData != null) {
+                        compositeRepository.createDose(
+                            updateData.medicationId,
+                            DoseStatus.TAKEN,
+                            null,
+                            LocalDateTime.now()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+
 
     fun onNextDateClicked() {
-        val newDate = _selectedDate.value.plusDays(1)
-        _selectedDate.update { it.plusDays(1) }
+        viewModelScope.launch{
+            _selectedDate.update { it.plusDays(1) }
+        }
+
     }
 
     fun onPreviousDateClicked() {
-        val newDate = _selectedDate.value.minusDays(1)
-        _selectedDate.update {newDate
+        viewModelScope.launch {
+            _selectedDate.update { it.minusDays(1) }
         }
     }
 

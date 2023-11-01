@@ -379,6 +379,11 @@ class AddMedicationViewModel(
     }
 
     fun onIntervalSaved(){
+        if(_frequencyQuestionData.onIntervalDaysSaved()){
+            viewModelScope.launch {
+                _showDialogState.update { AddMedDialogState.HideDialog }
+            }
+        }
 
     }
 
@@ -477,10 +482,12 @@ class AddMedicationViewModel(
                 )
                 frequencyRepository.insertFrequency(newFrequency)
 
-                //Nav to my medications screen
+                //TODO:Nav to my medications screen
             }
        } else {
-           //Disable button/make it an error
+           viewModelScope.launch{
+               _asNeededDetailsButtonEnabled.update { false }
+           }
        }
    }
 

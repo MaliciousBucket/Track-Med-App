@@ -30,6 +30,7 @@
     <string name="skip">Skip</string>
     <string name="un_skip">UnSkip</string>
     <string name="reschedule">Reschedule</string>
+    <string name="take_now">Take Now</string>
 
 <!--    Frequency Options-->
     <string name="daily">Daily</string>

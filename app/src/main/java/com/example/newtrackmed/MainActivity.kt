@@ -29,13 +29,13 @@ class MainActivity : ComponentActivity() {
 //                ) {
 //                    Greeting("Android")
 //                }
-                //TrackMedNavController()
+                TrackMedNavController()
 //                HomeScreen()
 
 //                MyMedicationsScreen()
                 //testDonut()
 //                TestDonut()
-                AddMedicationScreen()
+//                AddMedicationScreen()
             }
         }
     }

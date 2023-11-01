@@ -16,6 +16,7 @@ import com.example.newtrackmed.R
 import com.example.newtrackmed.data.entity.DoseEntity
 import com.example.newtrackmed.data.entity.DoseStatus
 import com.example.newtrackmed.data.entity.MedicationEntity
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 
@@ -70,7 +71,7 @@ fun Medication.asAsNeededDisplayDoseViewData() = DoseViewData(
 
 )
 
-fun MedicationEntity.asDisplayDoseViewData() = DoseViewData(
+fun MedicationEntity.asDisplayDoseViewData(selectedDate: LocalDateTime?) = DoseViewData(
     medicationId = id,
     doseId = null,
     name = name,
@@ -79,7 +80,7 @@ fun MedicationEntity.asDisplayDoseViewData() = DoseViewData(
     dosageUnit = dosageUnit,
     unitsTaken = unitsTaken,
     doseTime = timeToTake,
-    chipStatus = DoseChipStatus.Upcoming
+    chipStatus = selectedDate?.let { mapMedicationToDoseStatusChip(timeToTake, it) } ?: DoseChipStatus.Upcoming
 )
 
 fun mapMedicationToDoseStatusChip(timeToTake: LocalTime, selectedDate: LocalDateTime) : DoseChipStatus {
