@@ -1,23 +1,18 @@
 package com.example.newtrackmed.ui.feature.updateMedication
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,7 +27,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -247,12 +241,12 @@ fun AddMedicationTextQuestion(
 @Composable
 fun AddMedSaveButton(
     @StringRes text: Int,
-    isError: Boolean,
+    isEnabled: Boolean,
     onClick: () -> Unit
 ){
     val normalColor = Color(0xFF6DD58C)
     val errorColor = MaterialTheme.colorScheme.errorContainer
-    val buttonColor = if (isError) errorColor else normalColor
+    val buttonColor = if (isEnabled) normalColor else errorColor
 
     Button(
         modifier = Modifier
@@ -316,7 +310,7 @@ fun MedicationQuestionCardPreview(){
                 onNavCardClicked = {}
             )
 
-            AddMedSaveButton(text = R.string.save_medication_details, isError = true) {
+            AddMedSaveButton(text = R.string.save_medication_details, isEnabled = true) {
                 
             }
 

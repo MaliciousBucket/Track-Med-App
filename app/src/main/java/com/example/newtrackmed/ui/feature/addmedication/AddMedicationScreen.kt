@@ -91,10 +91,12 @@ fun AddMedicationScreen(){
                         dosageAnswer = screenData.dosageQuestionData.dosageAnswer,
                         dosageErrorMessage = screenData.dosageQuestionData.dosageErrorMessage,
                         isDosageError = screenData.dosageQuestionData.isDosageError,
+                        isSaveButtonEnabled = uiState.saveScheduledBtnState,
                         onSelectTimeClicked = { addMedViewModel.onsSelectTimeClicked() },
                         onSelectDateClicked = {addMedViewModel.onSelectDatesClick()},
                         onSelectFrequencyClicked = { addMedViewModel.onSelectFrequencyClick()},
                         onDosageValueChange = {addMedViewModel.onDosageChanged(it)},
+                        onSaveDoseDetailsClicked = { addMedViewModel.onScheduledSaveDoseDetailsClicked() },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -104,8 +106,10 @@ fun AddMedicationScreen(){
                         dosageAnswer = screenData.dosageQuestionData.dosageAnswer,
                         dosageErrorMessage = screenData.dosageQuestionData.dosageErrorMessage,
                         isDosageError = screenData.dosageQuestionData.isDosageError,
+                        isSaveButtonEnabled = uiState.saveAsNeededBtnState,
                         onDosageValueChange = {addMedViewModel.onDosageChanged(it)},
                         onSelectDateClicked = { addMedViewModel.onSelectDatesClick() },
+                        onSaveDoseDetailsClicked = { addMedViewModel.onAsNeededSaveDoseDetailsClicked() },
                         modifier = Modifier.padding(innerPadding)
                     )
 
@@ -208,7 +212,7 @@ fun AddMedicationScreen(){
                                         errorMessage = screenData.frequencyQuestionData.intervalDaysErrorMessage,
                                         onValueChange = {addMedViewModel.onIntervalChange(it)},
                                         onSaveClicked = { addMedViewModel.onIntervalSaved() }) {
-                                        addMedViewModel.onDialogDismissRequest()
+                                        addMedViewModel.onFrequencyDialogBackPressed()
                                     }
                                 }
 
@@ -222,7 +226,7 @@ fun AddMedicationScreen(){
                                         errorMessage = screenData.frequencyQuestionData.weekDaysErrorMessage,
                                         onItemClicked = {addMedViewModel.onWeekDayOptionSelected(it)},
                                         onSaveClicked = { addMedViewModel.onWeekDaysSaved() }) {
-                                        addMedViewModel.onDialogDismissRequest()
+                                        addMedViewModel.onFrequencyDialogBackPressed()
                                     }
                                 }
 
@@ -312,22 +316,6 @@ fun AddMedicationQuestion(
         }
     }
 }
-//https://stackoverflow.com/questions/69048715/is-there-a-way-in-jetpack-compose-to-retreive-the-real-string-value-of-a-string
-//https://stackoverflow.com/questions/74458452/jetpack-compose-handling-both-a-string-and-string-resource-identifier-for-a-text
-//@Composable
-//fun AddMedFormQuestion(
-//    onSelectFormClicked: () -> Unit
-//){
-//    AddMedicationQuestion(
-//        icon = Icons.Filled.Medication,
-//        title = R.string.enter_med_form,
-//    ) {
-//        NavigateToDialogCard(
-//            text = (R.string.enter_med_form_placeholder),
-//            onClick = onSelectFormClicked
-//        )
-//    }
-//}
 
 
 @OptIn(ExperimentalMaterial3Api::class)

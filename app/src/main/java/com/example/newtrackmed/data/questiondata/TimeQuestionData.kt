@@ -1,6 +1,7 @@
 package com.example.newtrackmed.data.questiondata
 
 import androidx.compose.runtime.mutableStateOf
+import co.yml.charts.common.extensions.isNotNull
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -32,5 +33,10 @@ class TimeQuestionData{
         cal.isLenient = false
 
         _timeAnswer.value = formatter.format(cal.time)
+    }
+
+    fun validateAnswer(): Boolean {
+        return _hoursAnswer.value.isNotNull()
+                && _minutesAnswer.value.isNotNull()
     }
 }

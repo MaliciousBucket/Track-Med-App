@@ -2,6 +2,7 @@ package com.example.newtrackmed.data.questiondata
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.mutableStateOf
+import co.yml.charts.common.extensions.isNotNull
 import java.text.SimpleDateFormat
 
 class DateQuestionData{
@@ -32,5 +33,11 @@ class DateQuestionData{
 
         _formattedDateAnswer.value = "$formattedStartDate - $formattedEndDate"
 
+    }
+
+    fun validateAnswer(): Boolean {
+        return _startDateAnswer.isNotNull()
+                && _endDateAnswer.isNotNull()
+                && _startDateAnswer.value!! > _endDateAnswer.value!!
     }
 }

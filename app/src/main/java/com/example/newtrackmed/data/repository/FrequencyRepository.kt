@@ -11,8 +11,8 @@ class FrequencyRepository(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    fun insertFrequency(){
-
+    suspend fun insertFrequency(frequency: FrequencyEntity){
+        return frequencyDao.insertFrequency(frequency)
     }
 
     fun updateFrequency(){

@@ -19,19 +19,18 @@ class DosageQuestionData{
     fun onDosageChanged(input: String){
         _dosageAnswer.value = input
     }
-    fun validateAnswer() : Boolean{
+    fun validateAnswer() {
         if(_dosageAnswer.value.isEmpty()){
             _dosageErrorMessage.value = "Please enter the interval between doses"
             _isDosageError.value = true
-            return false
+            return
         }
         if(!_dosageAnswer.value.isDigitsOnly()){
             _dosageErrorMessage.value = "Please enter a number"
             _isDosageError.value = true
-            return false
+            return
         }
         _dosageErrorMessage.value = ""
         _isDosageError.value = false
-        return true
     }
 }

@@ -182,6 +182,36 @@ class FrequencyQuestionData{
         }
     }
 
+    fun validateSelectedFrequencies(): Boolean {
+
+        return when (_frequencyTypeAnswer.value) {
+            FrequencyType.DAILY -> {
+                true
+            }
+            FrequencyType.EVERY_OTHER -> {
+                true
+            }
+
+            FrequencyType.EVERY_X_DAYS -> {
+                return _intervalDaysAnswer.value.isNotEmpty()
+                        && _isIntervalDaysError.value
+            }
+
+            FrequencyType.WEEK_DAYS -> {
+                return _selectedWeekDays.isNotEmpty()
+                        && _isWeekDaysError.value
+            }
+
+            FrequencyType.MONTH_DAYS -> {
+                return _selectedMonthDays.isNotEmpty()
+                        && _isMonthDaysError.value
+            }
+            null -> {
+                false
+            }
+        }
+    }
+
 }
 
 data class WeekDayOption(

@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.newtrackmed.data.entity.FrequencyEntity
 import com.example.newtrackmed.data.entity.FrequencyType
+import com.example.newtrackmed.data.entity.MedicationEntity
 import com.example.newtrackmed.data.questiondata.AddMedScreenData
 import com.example.newtrackmed.data.questiondata.AsNeededQuestionData
 import com.example.newtrackmed.data.questiondata.DateQuestionData
@@ -19,6 +21,7 @@ import com.example.newtrackmed.data.questiondata.MedTypeQuestionData
 import com.example.newtrackmed.data.questiondata.StrengthQuestionData
 import com.example.newtrackmed.data.questiondata.TimeQuestionData
 import com.example.newtrackmed.data.repository.DoseRepository
+import com.example.newtrackmed.data.repository.FrequencyRepository
 import com.example.newtrackmed.data.repository.MedicationRepository
 import com.example.newtrackmed.di.TrackMedApp
 import com.example.newtrackmed.util.ResourceWrapper
@@ -29,12 +32,18 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 
 data class AddMedicationUiState(
     val addMedicationScreenState: AddMedicationScreenState,
     val addMedDialogState: AddMedDialogState,
     val currentDialog: AddMedDialog,
-    val saveMedDetailsBtnState: Boolean
+    val saveMedDetailsBtnState: Boolean,
+    val saveAsNeededBtnState: Boolean,
+    val saveScheduledBtnState: Boolean
 )
 
 @Immutable
@@ -71,6 +80,7 @@ sealed interface AddMedDialogState{
 class AddMedicationViewModel(
     private val doseRepository: DoseRepository,
     private val medicationRepository: MedicationRepository,
+    private val frequencyRepository: FrequencyRepository,
     private val resourceWrapper: ResourceWrapper,
 ): ViewModel() {
 
@@ -110,13 +120,18 @@ class AddMedicationViewModel(
     private val _currentDialog = MutableStateFlow<AddMedDialog>(AddMedDialog.DoseUnitDialog)
     private val _showDialogState = MutableStateFlow<AddMedDialogState>(AddMedDialogState.HideDialog)
     private val _savedMedDetailsButtonEnabled = MutableStateFlow<Boolean>(true)
+    private val _asNeededDetailsButtonEnabled = MutableStateFlow<Boolean>(true)
+    private val _scheduledDetailsButtonEnabled = MutableStateFlow<Boolean>(true)
 
     val uiState: StateFlow<AddMedicationUiState> = combine(
         _addMedScreenState,
         _showDialogState,
         _currentDialog,
-        _savedMedDetailsButtonEnabled
-    ){screenState, dialogState, curDialog, saveMedBtnState ->
+//        _savedMedDetailsButtonEnabled,
+//        _asNeededDetailsButtonEnabled,
+//        _scheduledDetailsButtonEnabled
+//        saveMedBtnState
+    ){screenState, dialogState, curDialog,  ->
 
         val addMedScreenState: AddMedicationScreenState = when (screenState){
             is AddMedicationScreenState.MedicationDetails -> AddMedicationScreenState.MedicationDetails
@@ -141,11 +156,16 @@ class AddMedicationViewModel(
 
         val medDetailsButtonState = _savedMedDetailsButtonEnabled.value
 
+        val asNeededBttonState = _asNeededDetailsButtonEnabled.value
+        val scheduledButtonState = _scheduledDetailsButtonEnabled.value
+
         AddMedicationUiState(
             addMedScreenState,
             showDialogState,
             selectedDialog,
-            medDetailsButtonState
+            medDetailsButtonState,
+            asNeededBttonState,
+            scheduledButtonState
         )
 
     }.stateIn(
@@ -155,6 +175,8 @@ class AddMedicationViewModel(
             AddMedicationScreenState.MedicationDetails,
             AddMedDialogState.HideDialog,
             AddMedDialog.DoseUnitDialog,
+            true,
+            true,
             true
         )
     )
@@ -372,7 +394,13 @@ class AddMedicationViewModel(
     }
 
     fun onWeekDaysSaved(){
-
+        if(!_frequencyQuestionData.onWeekDaysSaved()){
+            return
+        } else{
+           viewModelScope.launch {
+               _showDialogState.update { AddMedDialogState.HideDialog }
+           }
+        }
     }
 
 //    ----- Month Days -----
@@ -387,7 +415,20 @@ class AddMedicationViewModel(
     }
 
     fun onMonthDaysSaved(){
+        if(!_frequencyQuestionData.onMonthDaysSaved()){
+            return
+        } else {
+            viewModelScope.launch{
+                _showDialogState.update { AddMedDialogState.HideDialog }
+            }
 
+        }
+    }
+
+    fun onFrequencyDialogBackPressed(){
+        viewModelScope.launch {
+            _currentDialog.update { AddMedDialog.FrequencyDialog }
+        }
     }
 
 //    ----- Dosage -----
@@ -396,16 +437,97 @@ class AddMedicationViewModel(
         _dosageQuestionData.onDosageChanged(input)
     }
 
-    fun onDosageSaved(){
-        if(!_dosageQuestionData.validateAnswer()){
-            return
-        }
-        else {
+   fun onAsNeededSaveDoseDetailsClicked(){
+       _dosageQuestionData.validateAnswer()
+        val questionsValid = !_dosageQuestionData.isDosageError &&
+                _dateQuestionData.validateAnswer()
+       if (questionsValid) {
             viewModelScope.launch {
-                _showDialogState.update { AddMedDialogState.HideDialog }
+            val startDate = _dateQuestionData.startDateAnswer?.let { Instant.ofEpochMilli(it)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()}
+
+            val endDate = _dateQuestionData.endDateAnswer?.let { Instant.ofEpochMilli(it)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()}
+
+                //Create the dose
+                val newMed = MedicationEntity(
+                    id = 0,
+                    name = _nameQuestionData.nameAnswer,
+                    type = _medTypeQuestionData.medTypeAnswer,
+                    dosage = _strengthQuestionData.strengthAnswer.toInt(),
+                    dosageUnit = _doseUnitQuestionData.doseUnitAnswer,
+                    unitsTaken = _dosageQuestionData.dosageAnswer.toInt(),
+                    timeToTake = LocalTime.of(0, 0),
+                    instructions = null,
+                    notes = null,
+                    startDate = startDate ?: LocalDate.now(),
+                    endDate = endDate ?: LocalDate.now().plusDays(7),
+                    isActive = true,
+                    isDeleted = false
+                )
+                val createdMedId = medicationRepository.insertMedicationEntity(newMed)
+                val newFrequency = FrequencyEntity(
+                    id = 0,
+                    medicationId = createdMedId.toInt(),
+                    frequencyIntervals = listOf(0),
+                    frequencyType = FrequencyType.DAILY,
+                    asNeeded = true
+                )
+                frequencyRepository.insertFrequency(newFrequency)
+
+                //Nav to my medications screen
+            }
+       } else {
+           //Disable button/make it an error
+       }
+   }
+
+    fun onScheduledSaveDoseDetailsClicked(){
+        _dosageQuestionData.validateAnswer()
+
+        val questionsValid = !_dosageQuestionData.isDosageError &&
+                _frequencyQuestionData.validateSelectedFrequencies() &&
+                _timeQuestionData.validateAnswer() &&
+                _dateQuestionData.validateAnswer()
+        if (questionsValid) {
+            viewModelScope.launch {
+                val startDate = _dateQuestionData.startDateAnswer?.let { Instant.ofEpochMilli(it)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()}
+
+                val endDate = _dateQuestionData.endDateAnswer?.let { Instant.ofEpochMilli(it)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()}
+
+                val hourToTake = _timeQuestionData.hoursAnswer?: 12
+                val minuteToTake = _timeQuestionData.minutesAnswer ?: 0
+                //Create the dose
+                val newMed = MedicationEntity(
+                    id = 0,
+                    name = _nameQuestionData.nameAnswer,
+                    type = _medTypeQuestionData.medTypeAnswer,
+                    dosage = _strengthQuestionData.strengthAnswer.toInt(),
+                    dosageUnit = _doseUnitQuestionData.doseUnitAnswer,
+                    unitsTaken = _dosageQuestionData.dosageAnswer.toInt(),
+                    timeToTake = LocalTime.of(hourToTake, minuteToTake),
+                    instructions = null,
+                    notes = null,
+                    startDate = startDate ?: LocalDate.now(),
+                    endDate = endDate ?: LocalDate.now().plusDays(7),
+                    isActive = true,
+                    isDeleted = false
+
+                )
+            }
+        } else {
+            viewModelScope.launch{
+                _asNeededDetailsButtonEnabled.update { false }
             }
         }
     }
+
 
     companion object{
         val Factory: ViewModelProvider.Factory = viewModelFactory {
@@ -413,11 +535,13 @@ class AddMedicationViewModel(
                 val appModule = TrackMedApp.appModule
                 val doseRepository = appModule.doseRepository
                 val medicationRepository = appModule.medicationRepository
+                val frequencyRepository = appModule.frequencyRepository
                 val resourceWrapper = appModule.resourceWrapper
 
                 AddMedicationViewModel(
                     doseRepository = doseRepository,
                     medicationRepository = medicationRepository,
+                    frequencyRepository = frequencyRepository,
                     resourceWrapper = resourceWrapper
                 )
             }

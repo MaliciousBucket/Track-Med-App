@@ -100,7 +100,7 @@ fun AddMedDetailsScreen(
             options = asNeededQuestionData.options,
             onOptionSelected = onAsNeededOptionSelected
         )
-        AddMedSaveButton(text = R.string.save_medication_details, isError = true) {
+        AddMedSaveButton(text = R.string.save_medication_details, isEnabled = true) {
             onSaveMedDetailsClicked()
         }
     }

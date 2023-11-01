@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.newtrackmed.R
+import com.example.newtrackmed.ui.feature.updateMedication.AddMedSaveButton
 import com.example.newtrackmed.ui.feature.updateMedication.AddMedicationTextQuestion
 import com.example.newtrackmed.ui.feature.updateMedication.MedicationNavQuestion
 
@@ -23,10 +24,12 @@ fun AddScheduledDetailsScreen(
     dosageAnswer: String,
     dosageErrorMessage: String,
     isDosageError: Boolean,
+    isSaveButtonEnabled: Boolean,
     onSelectTimeClicked: () -> Unit,
     onSelectDateClicked: () -> Unit,
     onSelectFrequencyClicked: () -> Unit,
-    onDosageValueChange: (String) -> Unit
+    onDosageValueChange: (String) -> Unit,
+    onSaveDoseDetailsClicked: () -> Unit,
 ){
     Column(
         modifier = modifier,
@@ -56,6 +59,9 @@ fun AddScheduledDetailsScreen(
             onValueChange = {newValue ->
                 onDosageValueChange(newValue)}
         )
+        AddMedSaveButton(text = R.string.save_medication_details, isEnabled = isSaveButtonEnabled) {
+            onSaveDoseDetailsClicked()
+        }
     }
 }
 
@@ -65,8 +71,10 @@ fun AsNeededDetailsScreen(
     dosageAnswer: String,
     dosageErrorMessage: String,
     isDosageError: Boolean,
+    isSaveButtonEnabled: Boolean,
     onDosageValueChange: (String) -> Unit,
     onSelectDateClicked: () -> Unit,
+    onSaveDoseDetailsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ){
     Column(
@@ -88,12 +96,11 @@ fun AsNeededDetailsScreen(
                 onDosageValueChange(newValue)
             }
         )
+        AddMedSaveButton(text = R.string.save_medication_details, isEnabled = isSaveButtonEnabled) {
+            onSaveDoseDetailsClicked()
+        }
     }
 }
-
-//val formattedTimeAnswer: State<String> = derivedStateOf {
-//    _timeAnswer.value.format(DateTimeFormatter.ofPattern("h:mm a"))
-//}
 @Composable
 fun MedTimeQuestion(
     @StringRes titleResourceId: Int,
