@@ -12,8 +12,8 @@ import com.example.newtrackmed.data.repository.DoseRepository
 import com.example.newtrackmed.data.repository.FrequencyRepository
 import com.example.newtrackmed.data.repository.MedicationDoseCompositeRepository
 import com.example.newtrackmed.data.repository.MedicationRepository
-import com.example.newtrackmed.ui.feature.addmedication.ContextResourceWrapper
-import com.example.newtrackmed.ui.feature.addmedication.ResourceWrapper
+import com.example.newtrackmed.util.ContextResourceWrapper
+import com.example.newtrackmed.util.ResourceWrapper
 import kotlinx.coroutines.CoroutineScope
 
 interface AppModule {

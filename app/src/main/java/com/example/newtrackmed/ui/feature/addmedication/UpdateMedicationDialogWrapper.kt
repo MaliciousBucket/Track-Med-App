@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -75,14 +76,16 @@ fun QuestionDialogWrapper(
     @StringRes title: Int,
     icon: ImageVector,
     @StringRes backButtonDescription: Int,
+    errorMessage: String,
+    isError: Boolean,
     onSaveClicked: (() -> Unit)?,
     onBackPressed: () -> Unit,
     content: @Composable () -> Unit,
 ){
         Card(
             modifier = Modifier
-                .fillMaxWidth()
-//                .padding(8.dp)
+//                .fillMaxWidth()
+                .fillMaxSize()
                 .wrapContentSize(Alignment.Center),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -115,6 +118,10 @@ fun QuestionDialogWrapper(
                 UpdateMedDialogTitle(
                     title = title,
                     icon = icon,
+                )
+                DialogErrorMessage(
+                    errorMessage = errorMessage,
+                    isError = isError
                 )
                 content()
             }
@@ -457,6 +464,38 @@ fun MedQuestionNavOption(
 }
 
 @Composable
+fun DialogErrorMessage(
+    errorMessage: String,
+    isError: Boolean,
+){
+    if(isError) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier.padding(4.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Error,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+
+@Composable
 fun FrequencyQuestionNavOption(
     option: FrequencyOption,
     isSelected: Boolean,
@@ -525,6 +564,7 @@ fun TestScreenPreview(){
                 title = R.string.notes_and_instructions,
                 icon = Icons.Filled.Edit,
             )
+            DialogErrorMessage(errorMessage = "Please use numerical characters only", isError = true)
 
 
             Spacer(modifier = Modifier.height(16.dp))

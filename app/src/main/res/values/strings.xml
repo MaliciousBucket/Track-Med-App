@@ -96,6 +96,9 @@
     <string name="frequency_dialog_title">Select the frequency at which you take this Medication</string>
     <string name="med_dates_dialog_title">Enter the start and end dates for your Medication</string>
     <string name="med_time_dialog_title">Enter the time at which you take this Medication</string>
+    <string name="interval_days_dialog_title">What is the interval between doses?</string>
+    <string name="week_days_dialog_title">On which days do you take your Medication?</string>
+    <string name="month_days_dialog_title">On which days do you take your Medication?</string>
 <!--    MyMedications-->
     <string name="medication_details">Medication Details</string>
     <string name="notes_and_instructions">Notes and Instructions</string>

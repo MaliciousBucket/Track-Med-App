@@ -94,7 +94,9 @@ fun MedDatePickerDialogPreview() {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-
+            MedDatesDialogContent(title = R.string.med_dates_dialog_title, backButtonDescription = R.string.nav_back_dose_details) {
+                
+            }
         }
     }
 

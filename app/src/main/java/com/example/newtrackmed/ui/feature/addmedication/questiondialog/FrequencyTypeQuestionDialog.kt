@@ -35,6 +35,8 @@ fun FrequencyTypeDialogContent(
         title = title,
         icon = Icons.Default.CalendarToday,
         backButtonDescription = backButtonDescription,
+        errorMessage = "",
+        isError = false,
         onSaveClicked = null,
         onBackPressed = { onBackPressed()}) {
 

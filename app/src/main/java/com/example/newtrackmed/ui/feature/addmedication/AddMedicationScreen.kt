@@ -34,9 +34,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.newtrackmed.R
 import com.example.newtrackmed.ui.feature.addmedication.questiondialog.DoseUnitDialogContent
 import com.example.newtrackmed.ui.feature.addmedication.questiondialog.FrequencyTypeDialogContent
+import com.example.newtrackmed.ui.feature.addmedication.questiondialog.IntervalDaysDialogContent
 import com.example.newtrackmed.ui.feature.addmedication.questiondialog.MedDatesDialogContent
 import com.example.newtrackmed.ui.feature.addmedication.questiondialog.MedTimeDialogContent
 import com.example.newtrackmed.ui.feature.addmedication.questiondialog.MedTypeDialogContent
+import com.example.newtrackmed.ui.feature.addmedication.questiondialog.MonthDaysQuestionDialogContent
+import com.example.newtrackmed.ui.feature.addmedication.questiondialog.WeekDaysQuestionDialogContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,8 +93,8 @@ fun AddMedicationScreen(){
                         isDosageError = screenData.dosageQuestionData.isDosageError,
                         onSelectTimeClicked = { addMedViewModel.onsSelectTimeClicked() },
                         onSelectDateClicked = {addMedViewModel.onSelectDatesClick()},
-                        onSelectFrequencyClicked = { /*TODO*/ },
-                        onDosageValueChange = {},
+                        onSelectFrequencyClicked = { addMedViewModel.onSelectFrequencyClick()},
+                        onDosageValueChange = {addMedViewModel.onDosageChanged(it)},
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -101,8 +104,11 @@ fun AddMedicationScreen(){
                         dosageAnswer = screenData.dosageQuestionData.dosageAnswer,
                         dosageErrorMessage = screenData.dosageQuestionData.dosageErrorMessage,
                         isDosageError = screenData.dosageQuestionData.isDosageError,
-                        onDosageValueChange = {},
-                        onSelectDateClicked = { addMedViewModel.onSelectDatesClick() })
+                        onDosageValueChange = {addMedViewModel.onDosageChanged(it)},
+                        onSelectDateClicked = { addMedViewModel.onSelectDatesClick() },
+                        modifier = Modifier.padding(innerPadding)
+                    )
+
                 }
 
                 is AddMedicationScreenState.ScheduleReminder -> {
@@ -156,11 +162,11 @@ fun AddMedicationScreen(){
                                         title = R.string.frequency_dialog_title,
                                         backButtonDescription = R.string.nav_back_dose_details,
                                         selectedFrequency = screenData.frequencyQuestionData.frequencyTypeAnswer,
-                                        onDailyClicked = { /*TODO*/ },
-                                        onEveryOtherDayClicked = { /*TODO*/ },
-                                        onEveryXDaysClicked = { /*TODO*/ },
-                                        onWeekDaysClicked = { /*TODO*/ },
-                                        onMonthDaysClicked = { /*TODO*/ }) {
+                                        onDailyClicked = { addMedViewModel.onDailySelected() },
+                                        onEveryOtherDayClicked = { addMedViewModel.onEveryOtherDaySelected() },
+                                        onEveryXDaysClicked = { addMedViewModel.onEveryXDaysSelected() },
+                                        onWeekDaysClicked = { addMedViewModel.onWeekDaysSelected() },
+                                        onMonthDaysClicked = { addMedViewModel.onMonthDaysSelected() }) {
 
                                     }
                                 }
@@ -191,6 +197,46 @@ fun AddMedicationScreen(){
                                         },
                                         onBackPressed = { addMedViewModel.onDialogDismissRequest() }
                                     )
+                                }
+
+                                is AddMedDialog.IntervalDaysDialog -> {
+                                    IntervalDaysDialogContent(
+                                        title = R.string.interval_days_dialog_title,
+                                        backButtonDescription = R.string.nav_back_frequency_options,
+                                        answer = screenData.frequencyQuestionData.intervalDaysAnswer,
+                                        isError = screenData.frequencyQuestionData.isIntervalDaysError,
+                                        errorMessage = screenData.frequencyQuestionData.intervalDaysErrorMessage,
+                                        onValueChange = {addMedViewModel.onIntervalChange(it)},
+                                        onSaveClicked = { addMedViewModel.onIntervalSaved() }) {
+                                        addMedViewModel.onDialogDismissRequest()
+                                    }
+                                }
+
+                                is AddMedDialog.WeekDaysDialog -> {
+                                    WeekDaysQuestionDialogContent(
+                                        title = R.string.week_days_dialog_title,
+                                        backButtonDescription = R.string.nav_back_frequency_options,
+                                        options = screenData.frequencyQuestionData.weekDayOptions,
+                                        selectedIndex = screenData.frequencyQuestionData.selectedWeekDays,
+                                        isError = screenData.frequencyQuestionData.isWeekDaysError,
+                                        errorMessage = screenData.frequencyQuestionData.weekDaysErrorMessage,
+                                        onItemClicked = {addMedViewModel.onWeekDayOptionSelected(it)},
+                                        onSaveClicked = { addMedViewModel.onWeekDaysSaved() }) {
+                                        addMedViewModel.onDialogDismissRequest()
+                                    }
+                                }
+
+                                is AddMedDialog.MonthDaysDialog -> {
+                                    MonthDaysQuestionDialogContent(
+                                        title = R.string.month_days_dialog_title,
+                                        backButtonDescription = R.string.nav_back_dose_details,
+                                        selectedDates = screenData.frequencyQuestionData.selectedMonthDays,
+                                        isError = screenData.frequencyQuestionData.isMonthDaysError,
+                                        errorMessage = screenData.frequencyQuestionData.monthDaysErrorMessage,
+                                        onItemClicked = {addMedViewModel.onMonthDayOptionsSelected(it)},
+                                        onSaveClicked = { addMedViewModel.onMonthDaysSaved() }) {
+                                        addMedViewModel.onDialogDismissRequest()
+                                    }
                                 }
 
                                 is AddMedDialog.SetReminderDialog -> {

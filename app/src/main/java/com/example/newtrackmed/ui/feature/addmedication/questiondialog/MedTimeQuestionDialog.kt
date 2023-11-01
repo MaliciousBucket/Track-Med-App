@@ -39,6 +39,8 @@ fun MedTimeDialogContent(
         title = dialogTitleResourceId,
         icon = Icons.Sharp.Schedule,
         backButtonDescription = backButtonDescription,
+        errorMessage = "",
+        isError = false,
         onSaveClicked = { onSaveClicked(state.hour, state.minute) },
         onBackPressed = onBackPressed
     ) {

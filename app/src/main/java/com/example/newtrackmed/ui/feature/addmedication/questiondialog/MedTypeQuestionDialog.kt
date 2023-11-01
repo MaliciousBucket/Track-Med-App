@@ -1,6 +1,5 @@
 package com.example.newtrackmed.ui.feature.addmedication.questiondialog
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,9 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.newtrackmed.R
 import com.example.newtrackmed.ui.feature.addmedication.CustomAnswerItem
-import com.example.newtrackmed.ui.feature.addmedication.DoseQuestionListItem
 import com.example.newtrackmed.ui.feature.addmedication.MedQuestionListOption
-import com.example.newtrackmed.ui.feature.addmedication.MedTypeOption
+import com.example.newtrackmed.data.questiondata.MedTypeOption
 import com.example.newtrackmed.ui.feature.addmedication.QuestionDialogWrapper
 import com.example.newtrackmed.ui.feature.updateMedication.AddMedDialogSaveButton
 
@@ -41,6 +39,8 @@ fun MedTypeDialogContent(
         title = dialogTitleResourceId,
         icon = Icons.Filled.Medication,
         backButtonDescription = R.string.nav_back_med_details,
+        errorMessage = errorMessage,
+        isError = isCustomAnswerError,
         onSaveClicked = { onSaveClicked()},
         onBackPressed = { onBackPressed() }
     ) {
