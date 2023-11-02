@@ -1,8 +1,6 @@
 package com.example.newtrackmed.ui.feature.report
 
-import android.content.Context
 import android.graphics.Typeface
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 
 import androidx.compose.ui.unit.dp
@@ -27,7 +24,6 @@ import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.utils.proportion
-import com.example.newtrackmed.di.TrackMedApp
 import com.example.newtrackmed.ui.theme.NewTrackMedTheme
 
 @Composable
@@ -83,12 +79,12 @@ fun testDonut() {
 
 @Composable
 fun TestDonut(){
-    val donutViewModel: DonutChartViewModel = viewModel(
-        factory = DonutChartViewModel.Factory
+    val donutViewModel: ReportsViewModel = viewModel(
+        factory = ReportsViewModel.Factory
     )
-    val pieChartData by donutViewModel.pieChartData.collectAsStateWithLifecycle()
+    val pieChartData by donutViewModel.allDoseDonutChartData.collectAsStateWithLifecycle()
 
-    Button(onClick = { donutViewModel.fetchDoseDonutChartData() }) {
+    Button(onClick = { donutViewModel.fetchAllDoseDonutChartData() }) {
         Text("Show Donut Chart")
     }
 
@@ -134,6 +130,59 @@ fun TestDonut(){
     } else {
         Text(text = "No Data :(")
     }
+}
+
+@Composable
+fun NewDonut(
+    pieChartData: PieChartData?,
+    onFetchData: () -> Unit
+){
+    Button(onClick = { onFetchData() }) {
+        Text("Show Donut Chart")
+    }
+
+    if(pieChartData != null){
+        val sumOfValues = pieChartData.totalLength
+
+        val proportions = pieChartData.slices.proportion(sumOfValues)
+
+        val pieChartConfig =
+            PieChartConfig(
+                labelVisible = true,
+                strokeWidth = 120f,
+                labelColor = Color.Black,
+                activeSliceAlpha = .9f,
+                isEllipsizeEnabled = true,
+                labelTypeface = Typeface.defaultFromStyle(Typeface.BOLD),
+                isAnimationEnable = true,
+                chartPadding = 25,
+                labelFontSize = 42.sp,
+            )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp)
+        ){
+            Legends(legendsConfig = DataUtils.getLegendsConfigFromPieChartData(pieChartData = pieChartData!!, 3))
+            DonutPieChart(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(400.dp),
+                pieChartData = pieChartData!!,
+                pieChartConfig = pieChartConfig
+            ){
+                    slice ->
+
+            }
+        }
+
+
+
+    } else {
+        Text(text = "No Data :(")
+    }
+
 }
 
 @Preview(showBackground = true)

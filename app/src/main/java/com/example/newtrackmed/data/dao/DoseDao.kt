@@ -55,6 +55,7 @@ interface DoseDao {
     fun getDoseWithHistoryById(doseId: Int): Flow<DoseWithHistory>
 
 
+
     @Query(
         "SELECT medicationId, doseId, dosage, createdTime FROM DoseEntity" +
                 " WHERE status = 0 AND medicationId IN (:medicationIds)" +
@@ -83,9 +84,33 @@ interface DoseDao {
     @Query("SELECT * FROM DoseEntity WHERE date(createdTime) = :selectedDate")
     suspend fun getAllSuspendDosesForDate(selectedDate: LocalDate): List<DoseEntity>
 
-    //Reports
+    //  -----     Reports ------
     @Query("SELECT status, COUNT(*) as count FROM DoseEntity GROUP BY status")
     fun getDoseCountByStatus(): Flow<List<DoseCount>>
+
+    @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId = :medicationId GROUP BY status")
+    fun getDoseCountStatusByMedId(medicationId: Int): Flow<List<DoseCount>>
+
+    @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId IN (:medicationIds) GROUP BY status")
+    fun getDoseCountsByMedIds(medicationIds: List<Int>): Flow<List<DoseCount>>
+
+
+    @Transaction
+    @Query("SELECT * FROM DoseEntity WHERE medicationId = :medicationId ORDER BY createdTime DESC LIMIT :limit")
+    fun getDoseWithHistoryByMedId(medicationId: Int, limit: Int): Flow<List<DoseWithHistory>>
+
+    @Transaction
+    @Query("SELECT * FROM DoseEntity WHERE medicationId IN  (:medicationIds) ORDER BY createdTime DESC LIMIT :limit")
+    fun getDoseWithHistoryByMedIds(medicationIds: List<Int>, limit: Int): Flow<List<DoseWithHistory>>
+
+    @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId = :medicationId GROUP BY status LIMIT :limit")
+    fun getDoseCountsByMedIdWithLimit(medicationId: Int, limit: Int): Flow<List<DoseCount>>
+
+    @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId IN (:medicationIds) GROUP BY status LIMIT :limit")
+    fun getDoseCountsByMultipleMedIdsWithLimit(medicationIds: List<Int>, limit: Int): Flow<List<DoseCount>>
+
+
+
 
 
 }

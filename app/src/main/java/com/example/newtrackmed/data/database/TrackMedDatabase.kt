@@ -30,7 +30,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 @Database(
-    version = 1,
+    version = 2,
     entities = [
         MedicationEntity::class,
         FrequencyEntity::class,
@@ -76,21 +76,25 @@ fun getDatabase(context: Context): TrackMedDatabase {
                             val frequencyDao = INSTANCE.frequencyDao()
                             val doseHistoryDao = INSTANCE.doseHistoryDao()
 
-                            val medicationNames = listOf("Ibuprofen", "Paracetamol")
-                            val medicationTypes = listOf("Pill", "Sachet")
+
+                            val medicationNames = listOf("Ibuprofen", "Paracetamol", "Aspirin", "Acetaminophen", "Codeine")
+                            val medicationTypes = listOf("Pill", "Sachet", "Capsule", "Liquid")
                             val dosageUnits = listOf("mg", "ml")
-                            val timeToTake = listOf(LocalTime.of(8, 0), LocalTime.of(12, 0))
-                            val instructions = listOf("Take with food", "Take on an empty stomach")
-                            val notes = listOf("Check for allergies", "Not for kids below 12")
+                            val timeToTake = listOf(LocalTime.of(8, 0), LocalTime.of(12, 0), LocalTime.of(18, 0), LocalTime.of(22, 0))
+                            val instructions = listOf("Take with food", "Take on an empty stomach", "Take with water")
+                            val notes = listOf("Check for allergies", "Not for kids below 12", "Keep away from sunlight")
                             val startDate = LocalDate.now()
                             val endDate = startDate.plusDays(90)
+                            val frequencyIntervals = listOf(1, 2, 3, 4, 5, 6, 7, 10, 15, 30)
+                            val frequencyTypes = listOf(FrequencyType.DAILY, FrequencyType.EVERY_OTHER, FrequencyType.EVERY_X_DAYS, FrequencyType.WEEK_DAYS, FrequencyType.MONTH_DAYS)
 
+                            val numMedications = 10
 
-                            for (i in 0..1) {
+                            for (i in 0 until numMedications) {
                                 val medication = MedicationEntity(
                                     id = 0,  // Auto-generated
-                                    name = medicationNames[i],
-                                    type = medicationTypes[i],
+                                    name = medicationNames.random(),
+                                    type = medicationTypes.random(),
                                     dosage = (100..500).random(),
                                     dosageUnit = dosageUnits.random(),
                                     unitsTaken = (1..3).random(),
@@ -103,13 +107,14 @@ fun getDatabase(context: Context): TrackMedDatabase {
                                     isDeleted = false
                                 )
 
-                                // Insert medication and get auto-generated ID
+
                                 val medicationId = medicationDao.insertMedication(medication)
 
-                                // Create 3 doses for this medication
-                                for (j in 0..2) {
+
+                                val numDoses = (3..10).random()
+                                for (j in 0 until numDoses) {
                                     val dose = DoseEntity(
-                                        doseId = 0, // Auto-generated
+                                        doseId = 0,
                                         medicationId = medicationId.toInt(),
                                         status = DoseStatus.values().random(),
                                         dosage = medication.dosage,
@@ -118,17 +123,16 @@ fun getDatabase(context: Context): TrackMedDatabase {
                                     doseDao.insertDose(dose)
                                 }
 
-                                // Create a frequency for this medication
+
                                 val frequency = FrequencyEntity(
-                                    id = 0, // Auto-generated
+                                    id = 0,
                                     medicationId = medicationId.toInt(),
-                                    frequencyIntervals = if (i == 0) listOf(0) else listOf(1,2,3),
-                                    frequencyType = if (i == 0) FrequencyType.DAILY else FrequencyType.MONTH_DAYS,
+                                    frequencyIntervals = List((1..3).random()) { frequencyIntervals.random() },
+                                    frequencyType = frequencyTypes.random(),
                                     asNeeded = false
                                 )
                                 frequencyDao.insertFrequency(frequency)
                             }
-
                         }
                     }
                 }).build()

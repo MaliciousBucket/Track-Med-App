@@ -9,6 +9,7 @@ import com.example.newtrackmed.data.model.DoseCount
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.data.model.DoseWithHistory
 import com.example.newtrackmed.data.model.LastTakenDose
+import com.example.newtrackmed.data.model.RecentDoseDetails
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -92,25 +93,21 @@ class DoseRepository(
                 val doses = mutableListOf<DoseEntity>()
                 val rescheduledDoses = mutableListOf<DoseEntity>()
 
-                // Asynchronously collect the doses
                 val dosesJob = launch {
                     doseDao.getDosesWithHistoryForSelectedDate(localDate).collect {
                         doses.addAll(it)
                     }
                 }
 
-                // Asynchronously collect the rescheduled doses
                 val rescheduledDosesJob = launch {
                     doseDao.getRescheduledDosesForDate(localDate).collect {
                         rescheduledDoses.addAll(it)
                     }
                 }
 
-                // Wait for both jobs to complete
                 dosesJob.join()
                 rescheduledDosesJob.join()
 
-                // Combine and emit the lists
                 emit(doses + rescheduledDoses)
             }
         }
@@ -143,7 +140,25 @@ class DoseRepository(
     fun getDoseCounts(): Flow<List<DoseCount>> =
         doseDao.getDoseCountByStatus().flowOn(Dispatchers.IO)
 
+    fun getDoseCountsByMedId(medicationId: Int): Flow<List<DoseCount>> =
+        doseDao.getDoseCountStatusByMedId(medicationId).flowOn(Dispatchers.IO)
 
+    fun getDoseCountsByMultipleMedIds(medicationIds: List<Int>) : Flow<List<DoseCount>> =
+        doseDao.getDoseCountsByMedIds(medicationIds).flowOn(Dispatchers.IO)
 
+    fun getLastTakenDoseByMedicationIds(medicationIds: List<Int>, limit: Int) : Flow<List<LastTakenDose>> =
+        doseDao.getLastTakenDosesByMedIds(medicationIds, limit).flowOn(Dispatchers.IO)
+
+    fun getDosesWithHistoryForMedId(medicationId: Int, limit: Int) : Flow<List<DoseWithHistory>> =
+        doseDao.getDoseWithHistoryByMedId(medicationId, limit).flowOn(Dispatchers.IO)
+
+    fun getDosesWithHistoryForMedIds(medicationIds: List<Int>, limit: Int) : Flow<List<DoseWithHistory>> =
+        doseDao.getDoseWithHistoryByMedIds(medicationIds, limit).flowOn(Dispatchers.IO)
+
+    fun getDoseCountsByMedIdWithLimit(medicationId: Int, limit: Int): Flow<List<DoseCount>>
+    = doseDao.getDoseCountsByMedIdWithLimit(medicationId, limit).flowOn(Dispatchers.IO)
+
+    fun getDoseCountsByMultipleMedIdsWithLimit(medicationIds: List<Int>, limit: Int): Flow<List<DoseCount>> =
+        doseDao.getDoseCountsByMultipleMedIdsWithLimit(medicationIds, limit).flowOn(Dispatchers.IO)
 
 }

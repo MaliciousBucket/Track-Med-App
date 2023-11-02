@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.newtrackmed.ui.feature.addmedication.AddMedicationScreen
 import com.example.newtrackmed.ui.feature.home.HomeScreen
 import com.example.newtrackmed.ui.feature.mymedications.MyMedicationsScreen
+import com.example.newtrackmed.ui.feature.report.ReportsScreen
 import com.example.newtrackmed.ui.feature.report.TestDonut
 import com.example.newtrackmed.ui.feature.report.testDonut
 import com.example.newtrackmed.ui.theme.NewTrackMedTheme
@@ -29,13 +30,14 @@ class MainActivity : ComponentActivity() {
 //                ) {
 //                    Greeting("Android")
 //                }
-                TrackMedNavController()
+//                TrackMedNavController()
 //                HomeScreen()
 
 //                MyMedicationsScreen()
                 //testDonut()
 //                TestDonut()
 //                AddMedicationScreen()
+                ReportsScreen()
             }
         }
     }

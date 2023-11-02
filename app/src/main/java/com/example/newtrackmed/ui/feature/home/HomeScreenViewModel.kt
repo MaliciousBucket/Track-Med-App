@@ -2,7 +2,6 @@ package com.example.newtrackmed.ui.feature.home
 
 import android.util.Log
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -11,38 +10,30 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.newtrackmed.data.Result
 import com.example.newtrackmed.data.asResult
-import com.example.newtrackmed.data.entity.DoseEntity
 import com.example.newtrackmed.data.entity.DoseStatus
-import com.example.newtrackmed.data.entity.FrequencyEntity
-import com.example.newtrackmed.data.entity.FrequencyType
-import com.example.newtrackmed.data.entity.MedicationEntity
 import com.example.newtrackmed.data.model.DoseViewData
-import com.example.newtrackmed.data.model.Medication
 import com.example.newtrackmed.data.model.UpdateDoseData
-import com.example.newtrackmed.data.model.asAsNeededDisplayDoseViewData
-import com.example.newtrackmed.data.model.asDisplayModel
-import com.example.newtrackmed.data.model.mapDoseStatusToChipStatus
 import com.example.newtrackmed.data.repository.DoseRepository
 import com.example.newtrackmed.data.repository.FrequencyRepository
 import com.example.newtrackmed.data.repository.MedicationDoseCompositeRepository
 import com.example.newtrackmed.data.repository.MedicationRepository
 import com.example.newtrackmed.di.TrackMedApp
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 data class TestUIState(

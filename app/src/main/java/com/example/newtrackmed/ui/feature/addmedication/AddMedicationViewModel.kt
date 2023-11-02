@@ -131,6 +131,7 @@ class AddMedicationViewModel(
 //        _asNeededDetailsButtonEnabled,
 //        _scheduledDetailsButtonEnabled
 //        saveMedBtnState
+        //These should be in the lambda instead of fetching the values directly, oh well!
     ){screenState, dialogState, curDialog,  ->
 
         val addMedScreenState: AddMedicationScreenState = when (screenState){

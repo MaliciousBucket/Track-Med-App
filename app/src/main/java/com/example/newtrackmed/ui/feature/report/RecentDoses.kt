@@ -1,4 +1,4 @@
-package com.example.newtrackmed.ui.feature.mymedications
+package com.example.newtrackmed.ui.feature.report
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -72,19 +72,24 @@ fun DosesTakenForToday(
 
 @Composable
 fun DisplayRecentDoses(
-    recentDoses: List<RecentDoseDetails>,
+    recentDoses: List<RecentDoseDetails?>,
     onCardClicked: (Int) -> Unit
 ) {
-    LazyColumn {
-        itemsIndexed(
-            recentDoses,
-            key = { _, item ->
-                item.doseId
+    if(recentDoses != null){
+        LazyColumn {
+            itemsIndexed(
+                recentDoses,
+                key = { _, item ->
+                    item?.doseId ?: item.hashCode()
+                }
+            ) { _, item ->
+                if (item != null) {
+                    RecentDoseItem(recentDose = item, onClick = onCardClicked)
+                }
             }
-        ) { _, item ->
-            RecentDoseItem(recentDose = item, onClick = onCardClicked)
         }
     }
+
 }
 
 @Composable
