@@ -23,7 +23,6 @@ import com.example.newtrackmed.data.model.mapToMyMedicationsViewData
 import com.example.newtrackmed.data.repository.DoseRepository
 import com.example.newtrackmed.data.repository.MedicationRepository
 import com.example.newtrackmed.di.TrackMedApp
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.core.axis.AxisPosition
 import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.entry.ChartEntry
@@ -34,6 +33,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 
 data class NewReportUiState(
@@ -63,6 +65,7 @@ sealed interface ReportScreenState{
 enum class GraphType{
     DONUT,
     BAR,
+    LINE,
 }
 
 data class ReportsListItem(
@@ -127,14 +130,18 @@ private val _selectedMedsIndex = mutableStateListOf<Int>()
 
     private val _doseDataWithIds = mutableStateListOf<DoseCountWithId>()
 
-    private val _chartBuilder = ChartEntryModelProducer()
+    private val _barChartBuilder = ChartEntryModelProducer()
 
-    val chartBuilder : ChartEntryModelProducer
-        get() = _chartBuilder
+    val barChartBuilder : ChartEntryModelProducer
+        get() = _barChartBuilder
 
     private val _currentGraphType = mutableStateOf<GraphType>(GraphType.DONUT)
 
     private val selectedMedNamesState = mutableStateListOf<String>()
+
+    private val _lineChartBuilder = ChartEntryModelProducer()
+    val lineCHartBuilder: ChartEntryModelProducer
+        get() = _lineChartBuilder
 
 
 
@@ -147,7 +154,7 @@ private val _selectedMedsIndex = mutableStateListOf<Int>()
         get() = _bottomAxisValueFormatter
 
 
-    fun updateTestChartEntries() {
+    private fun updateTestChartEntries() {
         viewModelScope.launch {
             if (_selectedMedsIndex.isNotEmpty()) {
                 val takenEntries = mutableListOf<ChartEntry>()
@@ -167,13 +174,47 @@ private val _selectedMedsIndex = mutableStateListOf<Int>()
 
                 val groupedEntries = listOf(takenEntries, missedEntries, skippedEntries, rescheduledEntries)
 
-                _chartBuilder.setEntries(groupedEntries)
+                _barChartBuilder.setEntries(groupedEntries)
                 _graphState.value = GraphState.BarChart
             } else {
                 _graphState.value = GraphState.EmptyData
             }
         }
     }
+
+    private fun updateLineChartEntries() {
+        viewModelScope.launch {
+            if (_selectedMedsIndex.isNotEmpty()) {
+                val startDate = LocalDateTime.now().minusDays(7)
+                val doseTimeRecords = doseRepository.getDoseTimeRecordsForLastWeek(_selectedMedsIndex.toList(), startDate)
+
+                val lineSeriesForEachMed = mutableListOf<List<ChartEntry>>()
+
+                _selectedMedsIndex.forEach { medicationId ->
+                    val medicationDoses = doseTimeRecords.filter { it.medicationId == medicationId }
+
+                    val lineEntriesForMed = medicationDoses.map { dose ->
+                        val dayIndex = Duration.between(startDate, dose.createdTime).toDays()
+
+                        val timeOfDay = dose.createdTime.hour + dose.createdTime.minute / 60f
+
+                        entryOf(dayIndex.toFloat(), timeOfDay)
+                    }
+
+                    lineSeriesForEachMed.add(lineEntriesForMed)
+                }
+
+                _lineChartBuilder.setEntries(lineSeriesForEachMed)
+                _graphState.value = GraphState.LineChart
+            } else {
+                _graphState.value = GraphState.EmptyData
+            }
+        }
+    }
+
+
+
+
 
     private fun updateChartEntries() {
         viewModelScope.launch {
@@ -189,7 +230,7 @@ private val _selectedMedsIndex = mutableStateListOf<Int>()
                     }
 
 
-                _chartBuilder.setEntries(entries)
+                _barChartBuilder.setEntries(entries)
 
                 _graphState.value = GraphState.BarChart
             } else {
@@ -239,6 +280,9 @@ private val _selectedMedsIndex = mutableStateListOf<Int>()
                 GraphType.BAR -> {
                     updateTestChartEntries()
                 }
+                GraphType.LINE -> {
+                    updateLineChartEntries()
+                }
 
             }
         }
@@ -249,8 +293,6 @@ private val _selectedMedsIndex = mutableStateListOf<Int>()
         refreshGraphData()
     }
 
-
-
     fun onSetToDonutClicked(){
         switchGraphType(GraphType.DONUT)
     }
@@ -259,20 +301,9 @@ private val _selectedMedsIndex = mutableStateListOf<Int>()
         switchGraphType(GraphType.BAR)
     }
 
-
-//    fun onRefreshClicked(){
-//        viewModelScope.launch {
-//        if (_selectedMedsIndex.isNotEmpty()) {
-//            setListDonut(_selectedMedsIndex.toList())
-//        }
-//            else {
-//                _graphState.update { GraphState.EmptyData }
-//        }
-//
-//        }
-//    }
-
-
+    fun onSetToLineClicked(){
+        switchGraphType(GraphType.LINE)
+    }
 
     init {
         setupData()

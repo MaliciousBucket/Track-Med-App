@@ -24,9 +24,4 @@ interface DoseRescheduleHistoryDao {
 
     @Query("UPDATE DoseRescheduleHistory SET rescheduleReason = :newReason WHERE historyId = :historyId")
     suspend fun updateRescheduleReason(historyId: Int, newReason: String?)
-
-//    @Query("")
-//    fun getRescheduledDosesForDate()
-
-
 }

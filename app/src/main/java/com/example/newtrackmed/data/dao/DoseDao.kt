@@ -10,6 +10,7 @@ import com.example.newtrackmed.data.entity.DoseEntity
 import com.example.newtrackmed.data.entity.DoseStatus
 import com.example.newtrackmed.data.model.DoseCount
 import com.example.newtrackmed.data.model.DoseCountWithId
+import com.example.newtrackmed.data.model.DoseTimeRecord
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.data.model.DoseWithHistory
 import com.example.newtrackmed.data.model.LastTakenDose
@@ -121,6 +122,8 @@ suspend fun getSuspendDoseCountWithIdByMedIds(medicationIds: List<Int>): List<Do
 
 
 
+
+
 //    ----------------------  By Med ID -----------------------
 
 
@@ -136,7 +139,13 @@ suspend fun getSuspendDoseCountWithIdByMedIds(medicationIds: List<Int>): List<Do
     suspend fun getSuspendDoseCountsByMultipleMedIdsWithLimit(medicationIds: List<Int>, limit: Int): List<DoseCount>
 
 
-
+    @Query("""
+        SELECT medicationId, doseId, dosage, createdTime
+        FROM DoseEntity
+        WHERE medicationId IN (:medicationIds)
+          AND createdTime >= :startDate
+        """)
+    suspend fun getDoseTimeRecordsForLastWeek(medicationIds: List<Int>, startDate: LocalDateTime): List<DoseTimeRecord>
 
 
 

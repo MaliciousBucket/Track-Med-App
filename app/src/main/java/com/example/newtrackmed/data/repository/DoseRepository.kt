@@ -9,6 +9,7 @@ import com.example.newtrackmed.data.entity.DoseRescheduleHistory
 import com.example.newtrackmed.data.entity.DoseStatus
 import com.example.newtrackmed.data.model.DoseCount
 import com.example.newtrackmed.data.model.DoseCountWithId
+import com.example.newtrackmed.data.model.DoseTimeRecord
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.data.model.DoseWithHistory
 import com.example.newtrackmed.data.model.LastTakenDose
@@ -211,6 +212,12 @@ class DoseRepository(
     suspend fun getSuspendDoseCountWithIdByMedIds(medicationIds: List<Int>): List<DoseCountWithId>{
         return withContext(Dispatchers.IO){
             doseDao.getSuspendDoseCountWithIdByMedIds(medicationIds)
+        }
+    }
+
+    suspend fun getDoseTimeRecordsForLastWeek(medicationIds: List<Int>, startDate: LocalDateTime): List<DoseTimeRecord> {
+        return withContext(Dispatchers.IO){
+            doseDao.getDoseTimeRecordsForLastWeek(medicationIds, startDate)
         }
     }
 

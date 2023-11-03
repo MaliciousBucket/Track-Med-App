@@ -65,7 +65,9 @@ import com.patrykandpatrick.vico.core.DefaultDimens
 import com.patrykandpatrick.vico.core.axis.AxisItemPlacer
 
 import com.patrykandpatrick.vico.core.axis.horizontal.HorizontalAxis
+import com.patrykandpatrick.vico.core.axis.vertical.VerticalAxis
 import com.patrykandpatrick.vico.core.chart.column.ColumnChart
+import com.patrykandpatrick.vico.core.chart.copy
 import com.patrykandpatrick.vico.core.chart.dimensions.HorizontalDimensions
 import com.patrykandpatrick.vico.core.chart.insets.Insets
 import com.patrykandpatrick.vico.core.chart.line.LineChart
@@ -283,13 +285,20 @@ fun TestLineChart(
     modelProducer: ChartEntryModelProducer
 ){
     val marker = rememberMarker()
-    ProvideChartStyle(rememberChartStyle(lineChartColors = chartColors, columnChartColors = chartColors)) {
+    ProvideChartStyle(rememberChartStyle(lineChartColors = listOf(Color.Red), columnChartColors = listOf(
+        Color.Blue))) {
+        val defaultLines = currentChartStyle.lineChart.lines
         Chart(
-            chart = lineChart(persistentMarkers = remember(marker) { mapOf(PERSISTENT_MARKER_X to marker) }),
+            chart = lineChart(
+                remember(defaultLines) {
+                    defaultLines.map { defaultLine -> defaultLine.copy(lineBackgroundShader = null) }
+                },
+            ),
             chartModelProducer = modelProducer,
             startAxis = rememberStartAxis(),
-            bottomAxis = rememberBottomAxis(guideline = null),
-            marker = marker,
+            bottomAxis = rememberBottomAxis(),
+            marker = rememberMarker(),
+            legend = rememberLegend(),
             runInitialAnimation = false,
         )
     }
@@ -449,6 +458,8 @@ modelProducer: ChartEntryModelProducer
 @Preview(showBackground = true)
 @Composable
 fun PreviewCharts(){
+    val chartEntryModelProducer1 = ChartEntryModelProducer(entriesOf(4f, 12f, 8f, 16f))
+    TestLineChart(modelProducer = chartEntryModelProducer1)
 //    TestBarChat()
-    otherChart()
+//    otherChart()
 }
