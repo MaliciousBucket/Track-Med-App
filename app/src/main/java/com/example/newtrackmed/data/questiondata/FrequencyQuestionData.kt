@@ -47,6 +47,7 @@ class FrequencyQuestionData{
     private val _intervalDaysAnswer = mutableStateOf<String>("")
     val intervalDaysAnswer: String
         get() = _intervalDaysAnswer.value
+
     private val _selectedWeekDays = mutableStateListOf<Int>()
     val selectedWeekDays: List<Int>
         get() = _selectedWeekDays

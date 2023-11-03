@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 
 class MedicationRepository (
     private val medicationDao: MedicationDao,
@@ -23,5 +24,13 @@ class MedicationRepository (
 
     fun getAllActiveMedications(): Flow<List<MedicationEntity>> =
         medicationDao.getAllActiveMedications().flowOn(Dispatchers.IO)
+
+
+
+    suspend fun getAllSuspendMedications(): List<MedicationEntity> {
+        return withContext(Dispatchers.IO){
+            medicationDao.getAllSuspendMedications()
+        }
+    }
 
 }

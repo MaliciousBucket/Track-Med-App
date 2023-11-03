@@ -1,6 +1,7 @@
 package com.example.newtrackmed.ui.feature.report
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -71,24 +72,27 @@ fun ReportsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(onClick = { reportsViewModel.showTestChart() }) {
-                Text(text = "Show Test Chart")
+                Text(text = "Get all donut")
             }
 
-            Button(onClick = { reportsViewModel.donutForId() }) {
+            Button(onClick = { reportsViewModel.donutForId(0) }) {
 
-                Text(text = "Get Pie Chart of med 0")
+                Text(text = "Get Donut of med 0")
             }
+
+
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Button(onClick = { reportsViewModel.recentDetailDosesForMed() }) {
-                Text(text = "Get recent for Id 0")
+            Button(onClick = { reportsViewModel.donutForId(1) }) {
+
+                Text(text = "Get Donut of med 1")
             }
 
             Button(onClick = { reportsViewModel.recentDetailDosesForMultipleMeds() }) {
@@ -96,6 +100,34 @@ fun ReportsScreen(
             }
 
 
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Button(onClick = { reportsViewModel.donutForId(2) }) {
+
+                Text(text = "Get Donut of med 2")
+            }
+            Button(onClick = { reportsViewModel.donutForId(3) }) {
+
+                Text(text = "Get Donut of med 3")
+            }
+
+
+        }
+
+        Box(modifier = Modifier.fillMaxWidth()){
+            if (reportsViewModel.showChartData){
+                NewestDonut(pieChartData = allDonutData, showChart = reportsViewModel.showChartData) {
+
+                }
+            }
         }
 
         when (uiState.recentDosesWithDetails) {
@@ -112,9 +144,9 @@ fun ReportsScreen(
 
         when (uiState.donutChartStatus) {
             is ChartStatus.Donut -> {
-                NewDonut(pieChartData = allDonutData) {
-                    reportsViewModel.fetchAllDoseDonutChartData()
-                }
+//                NewDonut(pieChartData = allDonutData) {
+//                    reportsViewModel.fetchAllDoseDonutChartData()
+//                }
             }
 
             is ChartStatus.Loading -> {

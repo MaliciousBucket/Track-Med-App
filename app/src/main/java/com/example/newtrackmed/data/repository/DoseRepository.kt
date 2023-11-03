@@ -1,5 +1,7 @@
 package com.example.newtrackmed.data.repository
 
+import android.util.Log
+import co.yml.charts.common.extensions.isNotNull
 import com.example.newtrackmed.data.dao.DoseDao
 import com.example.newtrackmed.data.dao.DoseRescheduleHistoryDao
 import com.example.newtrackmed.data.entity.DoseEntity
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
 class DoseRepository(
@@ -28,15 +31,16 @@ class DoseRepository(
         medicationId: Int,
         status: DoseStatus,
         dosage: Int,
-        createdTime: LocalDateTime){
+        createdTime: LocalDateTime
+    ) {
 
     }
 
-    suspend fun insertDose(doseEntity: DoseEntity): Long{
+    suspend fun insertDose(doseEntity: DoseEntity): Long {
         return doseDao.insertDose(doseEntity)
     }
 
-    suspend fun updateDose(doseEntity: DoseEntity){
+    suspend fun updateDose(doseEntity: DoseEntity) {
         doseDao.updateDose(doseEntity)
     }
 
@@ -68,19 +72,18 @@ class DoseRepository(
 //    }
 //    ----- DELETE -----
 
-    suspend fun deleteDose(dose: DoseEntity){
+    suspend fun deleteDose(dose: DoseEntity) {
         doseDao.deleteDose(dose)
     }
 
-    suspend fun deleteDoseById(doseId: Int){
+    suspend fun deleteDoseById(doseId: Int) {
         doseDao.deleteDoseById(doseId)
     }
 
 //    ----- Query -----
 
-    fun getDoseWithHistoryById(doseId: Int) : Flow<DoseWithHistory> =
+    fun getDoseWithHistoryById(doseId: Int): Flow<DoseWithHistory> =
         doseDao.getDoseWithHistoryById(doseId)
-
 
 
 //    ----- By Date -----
@@ -113,11 +116,7 @@ class DoseRepository(
         }
 
 
-
-
-
-
-    fun getRescheduledDosesForDate(){
+    fun getRescheduledDosesForDate() {
 
     }
 
@@ -127,14 +126,79 @@ class DoseRepository(
         doseDao.getLastTakenDoseByMedId(medicationId)
 
 
-
-    fun getLastTakenDosesForMedIds(medicationIds: List<Int>)  {
-
+    suspend fun getLastTakenDosesForAllMeds(): List<LastTakenDose>
+    {
+        val medicationIds = doseDao.getAllTakenMedicationIds()
+        return withContext(Dispatchers.IO){
+            doseDao.getSuspendLastTakenDosesForMeds(medicationIds, 1)
+        }
     }
 
-    fun getLastTakenDosesForAllMeds(){
 
+
+    //Suspend Reports --------------------------------------------------------
+
+    suspend fun getLastTakenDosesForMedIds(medicationIds: List<Int>, limit: Int): List<LastTakenDose>
+    {
+        return withContext(Dispatchers.IO){
+            doseDao.getSuspendLastTakenDosesForMeds(medicationIds, limit)
+        }
     }
+
+
+
+
+    suspend fun getSuspendDoseCounts(): List<DoseCount> {
+        return withContext(Dispatchers.IO){
+            doseDao.getSuspendDoseCountByStatus()
+        }.onEach { Log.d("Getting Dose Counts", "Collecting Dose Count") }
+    }
+
+
+
+
+    suspend fun getSuspendDoseCountsByMedId(medicationId: Int): List<DoseCount> {
+
+        return withContext(Dispatchers.IO){
+            doseDao.getSuspendDoseCountStatusByMedId(medicationId)
+        }
+    }
+
+
+    suspend fun getSuspendDoseCountsByMultipleMedIds(medicationIds: List<Int>): List<DoseCount>
+    {
+        return withContext(Dispatchers.IO){
+            doseDao.getSuspendDoseCountsByMedIds(medicationIds)
+        }
+    }
+
+
+
+
+
+
+
+    suspend fun getSuspendDoseCountsByMedIdWithLimit(medicationId: Int, limit: Int):List<DoseCount>
+    {
+        return withContext(Dispatchers.IO){
+            doseDao.getSuspendDoseCountsByMedIdWithLimit(medicationId, limit)
+        }
+    }
+
+    suspend fun getSuspendDoseCountsByMultipleMedIdsWithLimit(medicationIds: List<Int>, limit: Int):List<DoseCount>
+    {
+        return withContext(Dispatchers.IO){
+            doseDao.getSuspendDoseCountsByMultipleMedIdsWithLimit(medicationIds, limit)
+        }
+    }
+
+
+//    ----------------------------------------------------------------------------------------
+
+
+
+
+
 
     //Reports
     fun getDoseCounts(): Flow<List<DoseCount>> =

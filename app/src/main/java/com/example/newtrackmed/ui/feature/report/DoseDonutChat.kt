@@ -1,6 +1,7 @@
 package com.example.newtrackmed.ui.feature.report
 
 import android.graphics.Typeface
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -78,68 +79,9 @@ fun testDonut() {
 }
 
 @Composable
-fun TestDonut(){
-    val donutViewModel: ReportsViewModel = viewModel(
-        factory = ReportsViewModel.Factory
-    )
-    val pieChartData by donutViewModel.allDoseDonutChartData.collectAsStateWithLifecycle()
-
-    Button(onClick = { donutViewModel.fetchAllDoseDonutChartData() }) {
-        Text("Show Donut Chart")
-    }
-
-
-    if(pieChartData != null){
-        val sumOfValues = pieChartData!!.totalLength
-
-        val proportions = pieChartData!!.slices.proportion(sumOfValues)
-
-        val pieChartConfig =
-            PieChartConfig(
-                labelVisible = true,
-                strokeWidth = 120f,
-                labelColor = Color.Black,
-                activeSliceAlpha = .9f,
-                isEllipsizeEnabled = true,
-                labelTypeface = Typeface.defaultFromStyle(Typeface.BOLD),
-                isAnimationEnable = true,
-                chartPadding = 25,
-                labelFontSize = 42.sp,
-            )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(500.dp)
-        ){
-            Legends(legendsConfig = DataUtils.getLegendsConfigFromPieChartData(pieChartData = pieChartData!!, 3))
-            DonutPieChart(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp),
-                pieChartData = pieChartData!!,
-                pieChartConfig = pieChartConfig
-            ){
-                    slice ->
-
-            }
-        }
-
-
-
-    } else {
-        Text(text = "No Data :(")
-    }
-}
-
-@Composable
 fun NewDonut(
     pieChartData: PieChartData?,
-    onFetchData: () -> Unit
 ){
-    Button(onClick = { onFetchData() }) {
-        Text("Show Donut Chart")
-    }
 
     if(pieChartData != null){
         val sumOfValues = pieChartData.totalLength
@@ -164,7 +106,10 @@ fun NewDonut(
                 .fillMaxWidth()
                 .height(500.dp)
         ){
-            Legends(legendsConfig = DataUtils.getLegendsConfigFromPieChartData(pieChartData = pieChartData!!, 3))
+            Text(text = "Total Length: ${pieChartData.totalLength}")
+            Log.d("Entering Pie,", "Pie is recomposing. Length: ${pieChartData.totalLength}")
+            Log.d("Entering Pie,", "Pie is recomposing. Length: ${pieChartData.slices}")
+            Legends(legendsConfig = DataUtils.getLegendsConfigFromPieChartData(pieChartData = pieChartData!!, 2))
             DonutPieChart(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -175,12 +120,72 @@ fun NewDonut(
                     slice ->
 
             }
+
         }
 
 
 
     } else {
         Text(text = "No Data :(")
+    }
+
+}
+
+@Composable
+fun NewestDonut(
+    pieChartData: PieChartData?,
+    showChart: Boolean,
+    onFetchData: () -> Unit
+){
+    if(showChart) {
+
+
+        if (pieChartData != null) {
+            val sumOfValues = pieChartData.totalLength
+
+            val proportions = pieChartData.slices.proportion(sumOfValues)
+
+            val pieChartConfig =
+                PieChartConfig(
+                    labelVisible = true,
+                    strokeWidth = 120f,
+                    labelColor = Color.Black,
+                    activeSliceAlpha = .9f,
+                    isEllipsizeEnabled = true,
+                    labelTypeface = Typeface.defaultFromStyle(Typeface.BOLD),
+                    isAnimationEnable = true,
+                    chartPadding = 25,
+                    labelFontSize = 42.sp,
+                )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp)
+            ) {
+                Legends(
+                    legendsConfig = DataUtils.getLegendsConfigFromPieChartData(
+                        pieChartData = pieChartData!!,
+                        3
+                    )
+                )
+                DonutPieChart(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp),
+                    pieChartData = pieChartData!!,
+                    pieChartConfig = pieChartConfig
+                ) { slice ->
+
+                }
+            }
+
+
+        } else {
+            Text(text = "No Data :(")
+        }
+    } else {
+        Text(text = "${showChart}, Chart not showing")
     }
 
 }

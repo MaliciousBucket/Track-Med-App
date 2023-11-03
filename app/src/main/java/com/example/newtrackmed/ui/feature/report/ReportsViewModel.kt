@@ -2,12 +2,14 @@ package com.example.newtrackmed.ui.feature.report
 
 import android.util.Log
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import co.yml.charts.common.extensions.isNotNull
 import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.models.PieChartData
 import com.example.newtrackmed.data.entity.DoseStatus
@@ -78,6 +80,7 @@ class ReportsViewModel(
 
     private val _doseDonutChartDataForSelectedMed = MutableStateFlow<PieChartData?>(null)
 
+
     private val _doseDonutChartDataForMultipleMeds = MutableStateFlow<PieChartData?>(null)
 
     private val _recentDosesForSelectedMed = MutableStateFlow<List<LastTakenDose?>>(emptyList())
@@ -91,6 +94,10 @@ class ReportsViewModel(
     private val _mostRecentDosesData = MutableStateFlow<MostRecentDoses>(MostRecentDoses.Loading)
     private val _recentDosesWithDetails = MutableStateFlow<RecentDosesWithDetails>(RecentDosesWithDetails.Loading)
     private val _donutChartData = MutableStateFlow<ChartStatus>(ChartStatus.Loading)
+
+    private val _showChartData = mutableStateOf(false)
+    val showChartData: Boolean
+        get() = _showChartData.value
 
 
     private val statusColours = mapOf(
@@ -157,16 +164,25 @@ class ReportsViewModel(
     }
 
 
-    fun donutForId(){
+    fun donutForId(id: Int){
         Log.d("Debugging reports", "Donut For Id entered")
 
         viewModelScope.launch{
-            _donutChartData.update { ChartStatus.Loading }
-            fetchDonutChartDataForSingleMed(0)
-            _doseDonutChartDataForSelectedMed.value?.let { donutData ->
-                Log.d("Debug donut for ID", "Data: $donutData")
-                _donutChartData.update { ChartStatus.Donut }
-            } ?: _donutChartData.update { ChartStatus.Empty }
+            _showChartData.value = false
+            _singleMedDisplayId.value = id
+            fetchDonutChartDataForSingleMed(id)
+            Log.d("Selected Id", "ID: ${_singleMedDisplayId.value}")
+            Log.d("Selected Id", "ID: ${_allDoseDonutChartData.value}")
+            if(_allDoseDonutChartData.isNotNull()) {
+                _showChartData.value = true
+            }
+//            _donutChartData.update { ChartStatus.Loading }
+//            fetchDonutChartDataForSingleMed(id)
+//            _doseDonutChartDataForSelectedMed.value?.let { donutData ->
+//                Log.d("Debug donut for ID", "Data: $donutData")
+//                _allDoseDonutChartData.update { donutData }
+//                _donutChartData.update { ChartStatus.Donut }
+//            } ?: _donutChartData.update { ChartStatus.Empty }
 
         }
 
@@ -200,6 +216,7 @@ class ReportsViewModel(
         viewModelScope.launch {
             _singleMedDisplayId
                 .flatMapLatest { medicationId ->
+                    Log.d("Getting Donut Data", "For: $medicationId")
                     doseRepository.getDoseCountsByMedId(medicationId)
                 }.distinctUntilChanged()
                 .collect { doseCounts ->
@@ -216,7 +233,8 @@ class ReportsViewModel(
                         slices = slices,
                         plotType = PlotType.Donut
                     )
-                    _doseDonutChartDataForSelectedMed.update { newPieChartData }
+//                    _doseDonutChartDataForSelectedMed.update { newPieChartData }
+                    _allDoseDonutChartData.update { newPieChartData }
                 }
         }
     }

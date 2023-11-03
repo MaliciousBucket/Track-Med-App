@@ -81,8 +81,47 @@ interface DoseDao {
 
 //----- SUSPEND ------
 
+    @Query("SELECT DISTINCT medicationId FROM DoseEntity WHERE status = 0")
+    suspend fun getAllTakenMedicationIds(): List<Int>
+
+    @Query(
+        "SELECT medicationId, doseId, dosage, createdTime FROM DoseEntity" +
+                " WHERE status = 0 AND medicationId IN (:medicationIds)" +
+                " ORDER BY createdTime DESC LIMIT :limit"
+    )
+    suspend fun getSuspendLastTakenDosesForMeds(medicationIds: List<Int>, limit: Int): List<LastTakenDose>
+
     @Query("SELECT * FROM DoseEntity WHERE date(createdTime) = :selectedDate")
     suspend fun getAllSuspendDosesForDate(selectedDate: LocalDate): List<DoseEntity>
+
+    @Query("SELECT status, COUNT(*) as count FROM DoseEntity GROUP BY status")
+    suspend fun getSuspendDoseCountByStatus(): List<DoseCount>
+
+    @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId = :medicationId GROUP BY status")
+    suspend fun getSuspendDoseCountStatusByMedId(medicationId: Int): List<DoseCount>
+
+    @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId IN (:medicationIds) GROUP BY status")
+    suspend fun getSuspendDoseCountsByMedIds(medicationIds: List<Int>): List<DoseCount>
+
+
+
+
+    @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId = :medicationId GROUP BY status LIMIT :limit")
+    suspend fun getSuspendDoseCountsByMedIdWithLimit(medicationId: Int, limit: Int): List<DoseCount>
+
+    @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId IN (:medicationIds) GROUP BY status LIMIT :limit")
+    suspend fun getSuspendDoseCountsByMultipleMedIdsWithLimit(medicationIds: List<Int>, limit: Int): List<DoseCount>
+
+
+
+
+
+
+
+
+
+
+
 
     //  -----     Reports ------
     @Query("SELECT status, COUNT(*) as count FROM DoseEntity GROUP BY status")
