@@ -17,8 +17,6 @@ interface DoseRescheduleHistoryDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateDoseRescheduleHistory(doseRescheduleHistory: DoseRescheduleHistory)
 
-
-
     @Delete
     suspend fun deleteDoseRescheduleHistory(doseRescheduleHistory: DoseRescheduleHistory)
 

@@ -84,7 +84,6 @@ fun QuestionDialogWrapper(
 ){
         Card(
             modifier = Modifier
-//                .fillMaxWidth()
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center),
             shape = RoundedCornerShape(16.dp)
@@ -112,9 +111,7 @@ fun QuestionDialogWrapper(
                             Text(text = "Save")
                         }
                     }
-
                 }
-
                 UpdateMedDialogTitle(
                     title = title,
                     icon = icon,
@@ -163,7 +160,6 @@ fun SelectMedicationFormContent(
     onItemClicked: (Int) -> Unit
 ){
     LazyColumn(
-        //verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(8.dp)
     ){
         itemsIndexed(
@@ -388,7 +384,6 @@ fun MedQuestionListOption(
         Row (
             modifier = Modifier
                 .fillMaxWidth(),
-//                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ){
             Box(modifier = Modifier.padding(8.dp)){
@@ -559,7 +554,6 @@ fun TestScreenPreview(){
     NewTrackMedTheme {
         Column(modifier = Modifier.padding(16.dp)) {
             Spacer(modifier = Modifier.height(16.dp))
-//            SelectMedicationFormContent(options = myListOfOption, onItemClicked = {})
             UpdateMedDialogTitle(
                 title = R.string.notes_and_instructions,
                 icon = Icons.Filled.Edit,

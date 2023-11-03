@@ -90,7 +90,6 @@ class MedTypeQuestionData(
         }
 
     }
-
     private fun validateAnswer(): Boolean {
         val regPattern = Regex("^[a-zA-Z]*$")
         if (customAnswerSelected) {

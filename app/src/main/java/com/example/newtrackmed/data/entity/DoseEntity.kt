@@ -34,14 +34,14 @@ enum class DoseStatus(){
     SKIPPED,
     RESCHEDULED
 }
-
+//Mapping extension functions
 fun DoseEntity.asLastTaken() = LastTakenDose(
     doseId= doseId,
     medicationId = medicationId,
     createdTime = createdTime,
     dosage = dosage
 )
-
+//For when a medication doesn't have a matching dose
 fun MedicationEntity.mapToDoseEntity(
     status: DoseStatus,
     updateTime: LocalDateTime?,
@@ -53,20 +53,3 @@ fun MedicationEntity.mapToDoseEntity(
     createdTime = updateTime ?: LocalDateTime.now()
 )
 
-
-//sealed class DoseStatuses(val id: Int, @StringRes val stringValue: Int) {
-//    object Taken : DoseStatuses(1, R.string.taken)
-//    object Missed : DoseStatuses(2, R.string.missed)
-//    object Skipped : DoseStatuses(3, R.string.skipped)
-//    object Rescheduled : DoseStatuses(4, R.string.rescheduled)
-//
-//    companion object {
-//        private val map = values().associateBy(DoseStatuses::id)
-//
-//        fun fromId(type: Int): DoseStatuses? {
-//            return map[type]
-//        }
-//
-//        private fun values() = listOf(Taken, Missed, Skipped, Rescheduled)
-//    }
-//}

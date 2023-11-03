@@ -47,8 +47,6 @@ fun HomeScreen(){
     )
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
-
-
     Scaffold (
         topBar = {
             HomeTopAppBar(
@@ -129,7 +127,6 @@ fun HomeScreen(){
                 is UpdateDoseDialogUIState.Hidden -> {
                 }
             }
-
         }
     }
 
@@ -222,14 +219,13 @@ fun DoseStatusChip(
         }
     )
 }
-//verticalArrangement = Arrangement.spacedBy(16.dp),
+
 @Composable
 fun DisplayDoseCards(
     modifier: Modifier = Modifier,
     viewData: List<DoseViewData>,
     onCardClicked: (Int, Int?) -> Unit
 ){
-    Log.d("Debug Display Doses", "Displaying doses")
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -239,7 +235,6 @@ fun DisplayDoseCards(
             DoseCard(viewData = item) {
                 onCardClicked(item.medicationId, item.doseId)
             }
-//            Spacer(Modifier.height(8.dp))
         }
     }
 }

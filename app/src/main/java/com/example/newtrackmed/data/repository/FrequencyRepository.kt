@@ -22,15 +22,9 @@ class FrequencyRepository(
     fun getAllFrequencies(): Flow<List<FrequencyEntity>> =
     frequencyDao.getAllFrequencies()
 
-//    suspend fun getAllSuspendFrequencies(): List<FrequencyEntity>{
-//
-//    }
-
 
     fun getFrequencyByMedicationId(){
 
     }
-
-
 
 }

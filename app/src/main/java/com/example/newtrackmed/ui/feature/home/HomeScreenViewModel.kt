@@ -38,7 +38,6 @@ import java.time.LocalTime
 
 data class TestUIState(
     val viewData:DoseDisplayUIState,
-//    val dateUiState: SelectedDateUIState,
     val selectedDate: LocalDateTime,
     val dialogUIState: UpdateDoseDialogUIState
 )
@@ -117,10 +116,8 @@ class HomeScreenViewModel(
 
     val uiState: StateFlow<TestUIState> = combine(
         furtherTesting,
-//        _selectedDate,
         _selectedDate,
         _showDialogState
-//        dialogState
     ) { doseDataResult, currentDate, dialogState  ->
         val doseState: DoseDisplayUIState = when (doseDataResult) {
             is Result.Success -> DoseDisplayUIState.Success(doseDataResult.data)
@@ -132,7 +129,6 @@ class HomeScreenViewModel(
         }
 
         val dateState = _selectedDate.value
-       // val dateState: SelectedDateUIState = SelectedDateUIState.Success(LocalDateTime.now())
 
         val dialogState: UpdateDoseDialogUIState = when (dialogState) {
             is UpdateDoseDialogUIState.Success -> UpdateDoseDialogUIState.Success(_updateDoseData.value)

@@ -57,20 +57,6 @@ fun List<Pair<Medication, DoseEntity?>>.mapToDoseViewData(selectedDate: LocalDat
 }
 
 
-
-fun Medication.asAsNeededDisplayDoseViewData() = DoseViewData(
-    medicationId = id,
-    doseId = null,
-    name = name,
-    type = type,
-    dosage = dosage,
-    dosageUnit = dosageUnit,
-    unitsTaken = unitsTaken,
-    doseTime = timeToTake,
-    chipStatus = DoseChipStatus.Upcoming
-
-)
-
 fun MedicationEntity.asDisplayDoseViewData(selectedDate: LocalDateTime?) = DoseViewData(
     medicationId = id,
     doseId = null,

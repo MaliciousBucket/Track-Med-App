@@ -1,6 +1,5 @@
 package com.example.newtrackmed.data.repository
 
-import android.util.Log
 import com.example.newtrackmed.data.dao.DoseDao
 import com.example.newtrackmed.data.dao.FrequencyDao
 import com.example.newtrackmed.data.dao.MedicationDao
@@ -13,21 +12,15 @@ import com.example.newtrackmed.data.entity.mapToDoseEntity
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.data.model.DoseWithHistory
 import com.example.newtrackmed.data.model.LastTakenDose
-import com.example.newtrackmed.data.model.Medication
 import com.example.newtrackmed.data.model.MyMedicationsViewData
 import com.example.newtrackmed.data.model.UpdateDoseData
-import com.example.newtrackmed.data.model.asAsNeededDisplayDoseViewData
 import com.example.newtrackmed.data.model.asDisplayDoseViewData
-import com.example.newtrackmed.data.model.asDisplayModel
 import com.example.newtrackmed.data.model.mapDoseStatusToChipStatus
 import com.example.newtrackmed.data.model.mapToMyMedicationsViewData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
@@ -36,11 +29,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -88,7 +79,6 @@ class MedicationDoseCompositeRepository(
 
     suspend fun getAllActiveMedications() = withContext(Dispatchers.IO){
         val medications = medicationDao.getAllSuspendActiveMedications()
-        Log.d("Debug Active Meds", "Active Meds: $medications")
         _allActiveMedications.update { medications }
     }
 
@@ -107,7 +97,6 @@ class MedicationDoseCompositeRepository(
      fun testMeds() : Flow<List<DoseViewData>> {
         return medicationDao.getAllActiveMedications().map { medications ->
             medications.map { it.asDisplayDoseViewData(null) }.onEach {
-                Log.d("Debug Composite", "Returning: $medications")
             }
         }
      }
@@ -117,7 +106,6 @@ class MedicationDoseCompositeRepository(
 
     private val _testFrequencyFlow: Flow<List<FrequencyEntity>> =
         frequencyDao.getAllFrequencies()
-//    private val _testDoseFlow: Flow<List<DoseEntity>> =
 
     private val _medIdsForDate =  MutableStateFlow(setOf<Int>())
 
@@ -137,7 +125,7 @@ class MedicationDoseCompositeRepository(
                 if (frequency.asNeeded) {
                     return@filter true
                 }
-//                val interval = frequency.frequencyIntervals
+
                 val daysBetween = ChronoUnit.DAYS.between(medication.startDate, selectedDate)
                 val selectedDayOfWeek = selectedDate.dayOfWeek.value
                 val selectedDayOfMonth = selectedDate.dayOfMonth
@@ -233,12 +221,9 @@ class MedicationDoseCompositeRepository(
 
     private val _viewData = MutableStateFlow<List<DoseViewData?>>(emptyList())
 
-    fun observeDoseFeed(): Flow<List<DoseViewData?>> = _viewData
 
     fun getUpdateDoseData(medicationId: Int, doseId: Int?): Flow<UpdateDoseData> {
-        Log.d("Debug Dialog Data", "Entered with med: $medicationId, dose: $doseId")
         if(doseId == null) {
-            Log.d("Debug Dialog Data", "Entered null")
             val lastDoseFlow: Flow<LastTakenDose> =
                 doseRepository.getLastTakenDoseForMed(medicationId)
             val medicationFlow: Flow<MedicationEntity> =
@@ -247,7 +232,6 @@ class MedicationDoseCompositeRepository(
 
 
             return combine(medicationFlow, lastDoseFlow) { medication, lastDose ->
-                Log.d("Debug Dialog Data", "Returning: $medication LastDose: $lastDose")
                 UpdateDoseData(
                     medication = medication,
                     dose = null,
@@ -255,13 +239,11 @@ class MedicationDoseCompositeRepository(
                 )
             }
         }
-        Log.d("Debug Dialog Data", "Dose not null")
         val lastDoseFlow: Flow<LastTakenDose> = doseRepository.getLastTakenDoseForMed(medicationId)
         val medicationFlow: Flow<MedicationEntity> = medicationRepository.getMedicationById(medicationId)
         val doseWithHistoryFlow: Flow<DoseWithHistory> = doseRepository.getDoseWithHistoryById(doseId)
 
         return combine(medicationFlow, lastDoseFlow, doseWithHistoryFlow) { medication, lastDose, doseWithHistory ->
-            Log.d("Debug Dialog Data", "Returning: $medication, Dose: $doseWithHistory LastDose: $lastDose")
             UpdateDoseData(
                 medication = medication,
                 dose = doseWithHistory,
@@ -269,8 +251,6 @@ class MedicationDoseCompositeRepository(
             )
         }.distinctUntilChanged()
             .flowOn(Dispatchers.IO)
-            .onEach { Log.d("Debug Dialog Data", "Emitting Data") }
-
     }
 
     suspend fun missDose(doseId: Int, missedAt: LocalDateTime){
@@ -305,9 +285,9 @@ class MedicationDoseCompositeRepository(
         }
     }
 
-
+//TODO: Switch to using the repository
     private val _allFlowMedications: Flow<List<MedicationEntity>> =
-        medicationDao.getAllMedications().onEach { Log.d ("Debug Meds", "Collecting a med") }
+        medicationDao.getAllMedications()
 
 
     fun getMyMedicationsViewData(): Flow<List<MyMedicationsViewData>> {
@@ -316,16 +296,13 @@ class MedicationDoseCompositeRepository(
         }
         val lastTakenDoses: Flow<List<LastTakenDose>> = medicationIdsFlow.flatMapLatest { ids ->
             if (ids.isNotEmpty()) {
-                Log.d("Debug All Meds", "IDS: $ids")
                doseDao.getLastTakenDosesByMedIds(ids, limit = 1)
             } else {
-                Log.d("Debug All Last Doses", "Empty List??")
                 flowOf(emptyList())
             }
         }
         val allMedications: Flow<List<MedicationEntity>> = _allFlowMedications
         return combine(allMedications, lastTakenDoses){medications, doses ->
-            Log.d("Debug All Meds", "All meds: $medications All doses: $doses")
             medications.map {medication ->
                 val lastDose = doses.find { it.medicationId == medication.id }
                 medication.mapToMyMedicationsViewData(lastDose)

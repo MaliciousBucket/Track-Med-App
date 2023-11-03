@@ -35,6 +35,4 @@ class MedNameQuestionData{
         _nameErrorMessage.value = ""
         _isNameError.value = false
     }
-
-
 }

@@ -50,21 +50,6 @@ fun List<Triple<MedicationEntity, DoseWithHistory?, LastTakenDose?>>.mapToUpdate
     }
 }
 
-//fun MedicationEntity.mapToUpdateDoseData() = UpdateDoseData (
-//    medicationId = id,
-//    doseId = null,
-//    name = name,
-//    type = type,
-//    dosage = dosage,
-//    dosageUnit = dosageUnit,
-//    unitsTaken = unitsTaken,
-//    doseTime = timeToTake,
-//    notes = notes,
-//    instructions = instructions,
-//    updateDoseActions = UpdateDoseActions.TAKE,
-//
-//
-//    )
 
 
 

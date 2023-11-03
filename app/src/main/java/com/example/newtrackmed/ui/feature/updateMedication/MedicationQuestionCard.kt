@@ -83,7 +83,6 @@ fun MedicationQuestionCard(
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMedNavCard(
@@ -101,7 +100,6 @@ fun AddMedNavCard(
     ) {
         Row(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface),
-//            modifier = Modifier.padding(8.dp, 8.dp, 8.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -204,12 +202,10 @@ fun AddMedicationTextQuestion(
                         Text(
                             modifier = Modifier.fillMaxWidth(),
                             text = stringResource(id = placeholderResourceId),
-//                            textAlign = TextAlign.Center
                         )
                     }
                 },
                 textStyle = MaterialTheme.typography.titleMedium,
-//                    .copy(textAlign = TextAlign.Center),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -262,21 +258,6 @@ fun AddMedSaveButton(
 }
 
 @Composable
-fun Avatar(color: Color) {
-    Box(
-        modifier = Modifier
-            .size(16.dp)
-            .clip(CircleShape)
-            .background(color = color),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "Hello World")
-    }
-}
-
-
-
-@Composable
 fun AddMedDialogSaveButton(
     @StringRes text: Int,
     onClick: () -> Unit
@@ -313,10 +294,8 @@ fun MedicationQuestionCardPreview(){
             AddMedSaveButton(text = R.string.save_medication_details, isEnabled = true) {
                 
             }
-
             
             Spacer(modifier = Modifier.height(16.dp))
-            Avatar(color = Color.Blue)
 
         }
     }

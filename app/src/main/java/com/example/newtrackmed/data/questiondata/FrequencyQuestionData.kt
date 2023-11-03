@@ -56,7 +56,6 @@ class FrequencyQuestionData{
     val selectedMonthDays: List<Int>
         get() = _selectedMonthDays
 
-
 //    ----- Error Flags -----
     private val _isIntervalDaysError = mutableStateOf(false)
     val isIntervalDaysError: Boolean
@@ -69,8 +68,6 @@ class FrequencyQuestionData{
     private val _isMonthDaysError = mutableStateOf(false)
     val isMonthDaysError: Boolean
         get() = _isMonthDaysError.value
-
-
 
 
 //    ----- Error Messages -----
@@ -212,7 +209,6 @@ class FrequencyQuestionData{
             }
         }
     }
-
 }
 
 data class WeekDayOption(

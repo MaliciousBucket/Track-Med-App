@@ -53,26 +53,6 @@ class DoseRepository(
 //        doseDao.updateDoseStatus(doseId, status)
 //    }
 
-//    suspend fun rescheduleDose(
-//        doseId: Int,
-//        originalTime: LocalDateTime,
-//        rescheduledTo: LocalDateTime,
-//        reason: String?){
-//        val status = DoseStatus.RESCHEDULED.ordinal
-//
-//        val history = DoseRescheduleHistory(
-//            historyId = 0,
-//            doseId = doseId,
-//            originalTime = originalTime,
-//            rescheduledTime = rescheduledTo,
-//            rescheduleReason = reason
-//        )
-//        doseDao.updateDoseStatus(doseId, status)
-//
-//        doseRescheduleHistoryDao.insertDoseRescheduleHistory(history)
-//
-//    }
-//    ----- DELETE -----
 
     suspend fun deleteDose(dose: DoseEntity) {
         doseDao.deleteDose(dose)
@@ -87,40 +67,6 @@ class DoseRepository(
     fun getDoseWithHistoryById(doseId: Int): Flow<DoseWithHistory> =
         doseDao.getDoseWithHistoryById(doseId)
 
-
-//    ----- By Date -----
-
-    fun getDosesForSelectedDate(selectedDateTime: LocalDateTime): Flow<List<DoseEntity>> =
-        flow {
-            coroutineScope {
-                val localDate = selectedDateTime.toLocalDate()
-
-                val doses = mutableListOf<DoseEntity>()
-                val rescheduledDoses = mutableListOf<DoseEntity>()
-
-                val dosesJob = launch {
-                    doseDao.getDosesWithHistoryForSelectedDate(localDate).collect {
-                        doses.addAll(it)
-                    }
-                }
-
-                val rescheduledDosesJob = launch {
-                    doseDao.getRescheduledDosesForDate(localDate).collect {
-                        rescheduledDoses.addAll(it)
-                    }
-                }
-
-                dosesJob.join()
-                rescheduledDosesJob.join()
-
-                emit(doses + rescheduledDoses)
-            }
-        }
-
-
-    fun getRescheduledDosesForDate() {
-
-    }
 
 //    ----- Last Taken -----
 
@@ -175,11 +121,6 @@ class DoseRepository(
     }
 
 
-
-
-
-
-
     suspend fun getSuspendDoseCountsByMedIdWithLimit(medicationId: Int, limit: Int):List<DoseCount>
     {
         return withContext(Dispatchers.IO){
@@ -223,30 +164,5 @@ class DoseRepository(
 
 
 
-//------------------------------------------------------------------------------------------
-    //Reports
-    fun getDoseCounts(): Flow<List<DoseCount>> =
-        doseDao.getDoseCountByStatus().flowOn(Dispatchers.IO)
-
-    fun getDoseCountsByMedId(medicationId: Int): Flow<List<DoseCount>> =
-        doseDao.getDoseCountStatusByMedId(medicationId).flowOn(Dispatchers.IO)
-
-    fun getDoseCountsByMultipleMedIds(medicationIds: List<Int>) : Flow<List<DoseCount>> =
-        doseDao.getDoseCountsByMedIds(medicationIds).flowOn(Dispatchers.IO)
-
-    fun getLastTakenDoseByMedicationIds(medicationIds: List<Int>, limit: Int) : Flow<List<LastTakenDose>> =
-        doseDao.getLastTakenDosesByMedIds(medicationIds, limit).flowOn(Dispatchers.IO)
-
-    fun getDosesWithHistoryForMedId(medicationId: Int, limit: Int) : Flow<List<DoseWithHistory>> =
-        doseDao.getDoseWithHistoryByMedId(medicationId, limit).flowOn(Dispatchers.IO)
-
-    fun getDosesWithHistoryForMedIds(medicationIds: List<Int>, limit: Int) : Flow<List<DoseWithHistory>> =
-        doseDao.getDoseWithHistoryByMedIds(medicationIds, limit).flowOn(Dispatchers.IO)
-
-    fun getDoseCountsByMedIdWithLimit(medicationId: Int, limit: Int): Flow<List<DoseCount>>
-    = doseDao.getDoseCountsByMedIdWithLimit(medicationId, limit).flowOn(Dispatchers.IO)
-
-    fun getDoseCountsByMultipleMedIdsWithLimit(medicationIds: List<Int>, limit: Int): Flow<List<DoseCount>> =
-        doseDao.getDoseCountsByMultipleMedIdsWithLimit(medicationIds, limit).flowOn(Dispatchers.IO)
 
 }

@@ -10,5 +10,4 @@ class AddMedScreenData(
     val dateQuestionData: DateQuestionData,
     val frequencyQuestionData: FrequencyQuestionData,
     val dosageQuestionData: DosageQuestionData
-
 )

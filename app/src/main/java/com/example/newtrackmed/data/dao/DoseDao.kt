@@ -121,17 +121,6 @@ suspend fun getSuspendDoseCountWithIdStatusByMedId(medicationId: Int): List<Dose
 suspend fun getSuspendDoseCountWithIdByMedIds(medicationIds: List<Int>): List<DoseCountWithId>
 
 
-
-
-
-//    ----------------------  By Med ID -----------------------
-
-
-
-
-
-
-
     @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId = :medicationId GROUP BY status LIMIT :limit")
     suspend fun getSuspendDoseCountsByMedIdWithLimit(medicationId: Int, limit: Int): List<DoseCount>
 
@@ -179,9 +168,6 @@ suspend fun getSuspendDoseCountWithIdByMedIds(medicationIds: List<Int>): List<Do
 
     @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId IN (:medicationIds) GROUP BY status LIMIT :limit")
     fun getDoseCountsByMultipleMedIdsWithLimit(medicationIds: List<Int>, limit: Int): Flow<List<DoseCount>>
-
-
-
 
 
 }

@@ -33,8 +33,4 @@ interface MedicationDao {
     @Query("SELECT * FROM MedicationEntity WHERE isActive = 1")
     suspend fun getAllSuspendActiveMedications(): List<MedicationEntity>
 
-
-
-
-
 }
