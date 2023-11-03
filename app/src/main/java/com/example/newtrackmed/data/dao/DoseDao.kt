@@ -9,6 +9,7 @@ import androidx.room.Update
 import com.example.newtrackmed.data.entity.DoseEntity
 import com.example.newtrackmed.data.entity.DoseStatus
 import com.example.newtrackmed.data.model.DoseCount
+import com.example.newtrackmed.data.model.DoseCountWithId
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.data.model.DoseWithHistory
 import com.example.newtrackmed.data.model.LastTakenDose
@@ -102,6 +103,28 @@ interface DoseDao {
 
     @Query("SELECT status, COUNT(*) as count FROM DoseEntity WHERE medicationId IN (:medicationIds) GROUP BY status")
     suspend fun getSuspendDoseCountsByMedIds(medicationIds: List<Int>): List<DoseCount>
+
+
+
+
+//    ----------------------- By Med Id ---------------------------
+@Query("SELECT medicationId, status, COUNT(*) as count FROM DoseEntity GROUP BY medicationId, status")
+suspend fun getSuspendDoseCountWithIdByStatus(): List<DoseCountWithId>
+
+
+@Query("SELECT medicationId, status, COUNT(*) as count FROM DoseEntity WHERE medicationId = :medicationId GROUP BY medicationId, status")
+suspend fun getSuspendDoseCountWithIdStatusByMedId(medicationId: Int): List<DoseCountWithId>
+
+
+@Query("SELECT medicationId, status, COUNT(*) as count FROM DoseEntity WHERE medicationId IN (:medicationIds) GROUP BY medicationId, status")
+suspend fun getSuspendDoseCountWithIdByMedIds(medicationIds: List<Int>): List<DoseCountWithId>
+
+
+
+//    ----------------------  By Med ID -----------------------
+
+
+
 
 
 

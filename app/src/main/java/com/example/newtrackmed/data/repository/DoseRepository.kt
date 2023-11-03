@@ -8,6 +8,7 @@ import com.example.newtrackmed.data.entity.DoseEntity
 import com.example.newtrackmed.data.entity.DoseRescheduleHistory
 import com.example.newtrackmed.data.entity.DoseStatus
 import com.example.newtrackmed.data.model.DoseCount
+import com.example.newtrackmed.data.model.DoseCountWithId
 import com.example.newtrackmed.data.model.DoseViewData
 import com.example.newtrackmed.data.model.DoseWithHistory
 import com.example.newtrackmed.data.model.LastTakenDose
@@ -193,13 +194,29 @@ class DoseRepository(
     }
 
 
-//    ----------------------------------------------------------------------------------------
+//    --------------------------Reports with status by Med Id--------------------------------------------------------------
+
+    suspend fun getSuspendDoseCountWithIdByStatus(): List<DoseCountWithId>{
+        return withContext(Dispatchers.IO){
+            doseDao.getSuspendDoseCountWithIdByStatus()
+        }
+    }
+
+    suspend fun getSuspendDoseCountWithIdStatusByMedId(medicationId: Int): List<DoseCountWithId>{
+        return withContext(Dispatchers.IO){
+            doseDao.getSuspendDoseCountWithIdStatusByMedId(medicationId)
+        }
+    }
+
+    suspend fun getSuspendDoseCountWithIdByMedIds(medicationIds: List<Int>): List<DoseCountWithId>{
+        return withContext(Dispatchers.IO){
+            doseDao.getSuspendDoseCountWithIdByMedIds(medicationIds)
+        }
+    }
 
 
 
-
-
-
+//------------------------------------------------------------------------------------------
     //Reports
     fun getDoseCounts(): Flow<List<DoseCount>> =
         doseDao.getDoseCountByStatus().flowOn(Dispatchers.IO)

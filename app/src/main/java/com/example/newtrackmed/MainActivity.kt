@@ -41,9 +41,9 @@ class MainActivity : ComponentActivity() {
 //                AddMedicationScreen()
                 //ReportsScreen()
 
-//                NewReportsScreen()
+                NewReportsScreen()
 
-                TestBarChat()
+//                TestBarChat()
             }
         }
     }

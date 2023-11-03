@@ -6,3 +6,8 @@ data class DoseCount(
     val status: DoseStatus,
     val count: Int
 )
+data class DoseCountWithId(
+    val medicationId: Int,
+    val status: DoseStatus,
+    val count: Int,
+)
