@@ -64,6 +64,8 @@ class MedicationDoseCompositeRepository(
 
     private val _dosesForData = MutableStateFlow<List<DoseEntity?>>(emptyList())
 
+    private val _viewData = MutableStateFlow<List<DoseViewData?>>(emptyList())
+
 
 
 
@@ -156,7 +158,7 @@ class MedicationDoseCompositeRepository(
         }.flowOn(Dispatchers.IO)
     }
 
-    fun createTestData( selectedDate: LocalDateTime): Flow<List<DoseViewData>> {
+    fun createDoseViewData(selectedDate: LocalDateTime): Flow<List<DoseViewData>> {
         val selectedLocalDate = selectedDate.toLocalDate()
         val dosesForDate = doseDao.getDosesForLocalDate(selectedLocalDate)
 
@@ -205,7 +207,7 @@ class MedicationDoseCompositeRepository(
         }
             .flowOn(Dispatchers.IO)
     }
-
+    //Was necessary for testing. Can be removed now.
     suspend fun setup() {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
@@ -219,10 +221,10 @@ class MedicationDoseCompositeRepository(
     }
 
 
-    private val _viewData = MutableStateFlow<List<DoseViewData?>>(emptyList())
 
 
-    fun getUpdateDoseData(medicationId: Int, doseId: Int?): Flow<UpdateDoseData> {
+
+    fun getUpdateDoseData(medicationId: Int, doseId: Int?, selectedDate: LocalDateTime): Flow<UpdateDoseData> {
         if(doseId == null) {
             val lastDoseFlow: Flow<LastTakenDose> =
                 doseRepository.getLastTakenDoseForMed(medicationId)
@@ -235,7 +237,8 @@ class MedicationDoseCompositeRepository(
                 UpdateDoseData(
                     medication = medication,
                     dose = null,
-                    lastTakenDose = lastDose
+                    lastTakenDose = lastDose,
+                    selectedDate = selectedDate
                 )
             }
         }
@@ -247,7 +250,8 @@ class MedicationDoseCompositeRepository(
             UpdateDoseData(
                 medication = medication,
                 dose = doseWithHistory,
-                lastTakenDose = lastDose
+                lastTakenDose = lastDose,
+                selectedDate
             )
         }.distinctUntilChanged()
             .flowOn(Dispatchers.IO)

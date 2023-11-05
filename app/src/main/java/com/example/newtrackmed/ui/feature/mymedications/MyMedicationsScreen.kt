@@ -40,7 +40,11 @@ import com.example.newtrackmed.ui.feature.home.LastDoseChip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyMedicationsScreen(){
+fun MyMedicationsScreen(
+    onNavigateToHomeScreen: () -> Unit,
+    onNavigateToReportsScreen: () -> Unit,
+    onNavigateToAddMedication: () -> Unit,
+){
     val myMedsViewModel: MyMedicationsViewModel = viewModel(
         factory = MyMedicationsViewModel.Factory
     )
@@ -49,26 +53,26 @@ fun MyMedicationsScreen(){
 
     Scaffold(
         topBar = {
-//            MyMedicationsTopAppBar(
-//                title = ,
-//                isMainScreen = ,
-//                menuExpanded = ,
-//                showAddButton = ,
-//                canNavigateBack = ,
-//                onAddButtonClicked = { /*TODO*/ },
-//                onNavigateBackPressed = { /*TODO*/ },
-//                onAddMedicationClicked = { /*TODO*/ },
-//                onAddDoseClicked = { /*TODO*/ },
-//                onAddDoseForMedClicked = { /*TODO*/ },
-//                onDropDownMenuDismissRequest = { }
-//            )
-                 CenterAlignedTopAppBar(title = { Text(text = "MyMedications") })
+            MyMedicationsTopAppBar(
+                title = "My Medications",
+                isMainScreen = true,
+                menuExpanded = false,
+                showAddButton = true,
+                canNavigateBack = false,
+                onAddButtonClicked = { /*TODO*/ },
+                onNavigateBackPressed = { /*TODO*/ },
+                onAddMedicationClicked = { onNavigateToAddMedication() },
+                onAddDoseClicked = { /*TODO*/ },
+                onAddDoseForMedClicked = { /*TODO*/ },
+                onDropDownMenuDismissRequest = { }
+            )
+//                 CenterAlignedTopAppBar(title = { Text(text = "MyMedications") })
         },
         bottomBar = {
             BottomNavBar(
-                onHomeClick = { /*TODO*/ },
+                onHomeClick = { onNavigateToHomeScreen() },
                 onMyMedicationsClick = { /*TODO*/ },
-                onReportsClick = {}
+                onReportsClick = {onNavigateToReportsScreen()}
             )
         },
 
@@ -219,7 +223,10 @@ fun MyMedicationsTopAppBar(
         actions = {
             if(showAddButton){
                 IconButton(
-                    onClick = { onAddButtonClicked() }
+                    onClick = {
+//                        onAddButtonClicked()
+                        onAddMedicationClicked()
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Add,

@@ -36,18 +36,10 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-data class TestUIState(
+data class HomeUiState(
     val viewData:DoseDisplayUIState,
     val selectedDate: LocalDateTime,
     val dialogUIState: UpdateDoseDialogUIState
-)
-
-
-data class HomeUiState(
-    val displayedDoses: DoseDisplayUIState,
-    val updateDoseDialog: UpdateDoseDialogUIState,
-    val selectedDate: SelectedDateUIState,
-    val isError: Boolean,
 )
 
 @Immutable
@@ -69,7 +61,6 @@ sealed interface SelectedDateUIState{
         val selectedDate: LocalDateTime
     ): SelectedDateUIState
     object Loading: SelectedDateUIState
-//    data class Loading(val displayText: String,)
 
 }
 
@@ -91,12 +82,9 @@ class HomeScreenViewModel(
         }
     }
 
-    private val _flowMeds: Flow<Result<List<DoseViewData>>> =
-        compositeRepository.testMeds().asResult()
-
-    private val furtherTesting: Flow<Result<List<DoseViewData>>> = _selectedDate.map {it }
+    private val doseDisplayDataList: Flow<Result<List<DoseViewData>>> = _selectedDate.map {it }
         .distinctUntilChanged().flatMapLatest { selectedDate ->
-            compositeRepository.createTestData(selectedDate).asResult()
+            compositeRepository.createDoseViewData(selectedDate).asResult()
         }
 
     private val _showDialogState = MutableStateFlow<UpdateDoseDialogUIState>(UpdateDoseDialogUIState.Hidden)
@@ -114,8 +102,8 @@ class HomeScreenViewModel(
 
     }
 
-    val uiState: StateFlow<TestUIState> = combine(
-        furtherTesting,
+    val uiState: StateFlow<HomeUiState> = combine(
+        doseDisplayDataList,
         _selectedDate,
         _showDialogState
     ) { doseDataResult, currentDate, dialogState  ->
@@ -135,7 +123,7 @@ class HomeScreenViewModel(
             is UpdateDoseDialogUIState.Hidden ->UpdateDoseDialogUIState.Hidden
         }
 
-    TestUIState(
+    HomeUiState(
         doseState,
         dateState,
          dialogState
@@ -143,7 +131,7 @@ class HomeScreenViewModel(
 }.stateIn(
     scope = viewModelScope,
         started= SharingStarted.Lazily,
-    initialValue = TestUIState(
+    initialValue = HomeUiState(
         DoseDisplayUIState.Loading,
         LocalDateTime.now(),
         UpdateDoseDialogUIState.Hidden
@@ -152,7 +140,7 @@ class HomeScreenViewModel(
 fun onCardClicked(medicationId: Int, doseId: Int?) {
     Log.d("Card Clicked", "Card: $medicationId")
     viewModelScope.launch {
-        val updateData = compositeRepository.getUpdateDoseData(medicationId, doseId)
+        val updateData = compositeRepository.getUpdateDoseData(medicationId, doseId, _selectedDate.value)
             .distinctUntilChanged()
             .first()
         _updateDoseData.update { updateData }
@@ -255,18 +243,16 @@ fun onCardClicked(medicationId: Int, doseId: Int?) {
 
     fun onTakeNowClicked() {
         viewModelScope.launch {
-            viewModelScope.launch {
-                withContext(Dispatchers.Default) {
-                    _showDialogState.update { UpdateDoseDialogUIState.Hidden }
-                    val updateData = _updateDoseData.value
-                    if (updateData != null) {
-                        compositeRepository.createDose(
-                            updateData.medicationId,
-                            DoseStatus.TAKEN,
-                            null,
-                            LocalDateTime.now()
-                        )
-                    }
+            withContext(Dispatchers.Default) {
+                _showDialogState.update { UpdateDoseDialogUIState.Hidden }
+                val updateData = _updateDoseData.value
+                if (updateData != null) {
+                    compositeRepository.createDose(
+                        updateData.medicationId,
+                        DoseStatus.TAKEN,
+                        null,
+                        LocalDateTime.now()
+                    )
                 }
             }
         }

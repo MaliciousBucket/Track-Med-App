@@ -5,6 +5,8 @@ import com.example.newtrackmed.data.entity.DoseStatus
 import com.example.newtrackmed.data.entity.MedicationEntity
 import com.example.newtrackmed.data.entity.asLastTaken
 import com.example.newtrackmed.data.model.Medication
+import com.example.newtrackmed.data.model.UpdateDoseActions
+import com.example.newtrackmed.data.model.UpdateDoseData
 import com.example.newtrackmed.data.model.asDisplayModel
 import com.example.newtrackmed.data.model.mapToDoseViewData
 import com.example.newtrackmed.data.model.mapToDoseWithHistory
@@ -161,7 +163,7 @@ val testUpdateDataData = listOf(
     )
 )
 
-val previewUpdateDoseData = testUpdateDataData.mapToUpdateDoseData()
+val previewUpdateDoseData = testUpdateDataData.mapToUpdateDoseData(LocalDateTime.now())
 
 val previewMyMedicationsLastDoses = listOf(
     previewDoses[0].asLastTaken(),
@@ -188,3 +190,19 @@ val recentDosePreviewData = listOf(
 )
 
 val recentDosePreviewList = recentDosePreviewData.mapToRecentDoseDetails(previewMedicationEntities[0])
+
+val previewUpdateTestData = UpdateDoseData(
+    medicationId = 1,
+    doseId = null,
+    name = "Mesalazine",
+    type = "Sachet",
+    dosage = 2,
+    dosageUnit = "g",
+    unitsTaken = 2,
+    doseTime = LocalTime.of(9, 30),
+    notes = "",
+    instructions = "Take with water",
+    updateDoseActions = UpdateDoseActions.FUTURE,
+    lastTakenDose = null,
+    rescheduleHistory = null
+)

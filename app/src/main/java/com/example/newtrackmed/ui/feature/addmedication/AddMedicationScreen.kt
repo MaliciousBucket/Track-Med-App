@@ -43,7 +43,10 @@ import com.example.newtrackmed.ui.feature.addmedication.questiondialog.WeekDaysQ
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddMedicationScreen(){
+fun AddMedicationScreen(
+    onNavBackPressed: () -> Unit,
+    onMedicationSaved: () -> Unit
+){
     val addMedViewModel: AddMedicationViewModel = viewModel(
         factory = AddMedicationViewModel.Factory
     )

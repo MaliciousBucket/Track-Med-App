@@ -44,7 +44,9 @@ fun HomeTopAppBar(
     ) {
         CenterAlignedTopAppBar(
             title = {
-                Text(text = stringResource(R.string.app_name))
+                Text( text = "TrackMed"
+//                    text = stringResource(R.string.app_name)
+                )
             },
             actions = {
                 CalendarButton {

@@ -4,6 +4,8 @@ import com.example.newtrackmed.data.entity.DoseEntity
 import com.example.newtrackmed.data.entity.DoseRescheduleHistory
 import com.example.newtrackmed.data.entity.DoseStatus
 import com.example.newtrackmed.data.entity.MedicationEntity
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 data class UpdateDoseData internal constructor(
@@ -25,7 +27,8 @@ data class UpdateDoseData internal constructor(
 ){
     constructor(medication: MedicationEntity,
                 dose: DoseWithHistory?,
-                lastTakenDose: LastTakenDose?
+                lastTakenDose: LastTakenDose?,
+        selectedDate: LocalDateTime
     ): this (
         medicationId = medication.id,
         doseId = dose?.doseEntity?.doseId,
@@ -37,16 +40,16 @@ data class UpdateDoseData internal constructor(
         doseTime = dose?.doseEntity?.createdTime?.toLocalTime() ?: medication.timeToTake,
         notes = medication.notes,
         instructions = medication.instructions,
-        updateDoseActions = dose?.doseEntity?.status.toUpdateDoseActions(),
+        updateDoseActions = dose?.doseEntity?.status.toUpdateDoseActions(selectedDate),
         lastTakenDose = lastTakenDose,
         rescheduleHistory = dose?.histories
     )
 }
 
 
-fun List<Triple<MedicationEntity, DoseWithHistory?, LastTakenDose?>>.mapToUpdateDoseData(): List<UpdateDoseData> {
+fun List<Triple<MedicationEntity, DoseWithHistory?, LastTakenDose?>>.mapToUpdateDoseData(selectedDate: LocalDateTime): List<UpdateDoseData> {
     return map { (medication, dose, lastTakenDose) ->
-        UpdateDoseData(medication, dose, lastTakenDose)
+        UpdateDoseData(medication, dose, lastTakenDose, selectedDate)
     }
 }
 
@@ -62,7 +65,11 @@ enum class UpdateDoseActions{
     FUTURE
 }
 
-fun DoseStatus?.toUpdateDoseActions(): UpdateDoseActions {
+fun DoseStatus?.toUpdateDoseActions(selectedDate: LocalDateTime): UpdateDoseActions {
+    val currentDate = LocalDate.now()
+    if (selectedDate.toLocalDate().isAfter(currentDate)){
+        return UpdateDoseActions.FUTURE
+    }
     return when (this) {
         DoseStatus.TAKEN -> UpdateDoseActions.TAKEN
         DoseStatus.MISSED -> UpdateDoseActions.MISSED

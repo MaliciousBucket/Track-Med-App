@@ -35,13 +35,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.yml.charts.common.extensions.isNotNull
 import com.example.newtrackmed.R
+import com.example.newtrackmed.ui.component.BottomNavBar
 import com.example.newtrackmed.ui.feature.addmedication.MedQuestionListOption
 import com.example.newtrackmed.ui.feature.addmedication.MedQuestionNavOption
 import com.example.newtrackmed.ui.feature.mymedications.DisplayMyMedicationsList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewReportsScreen(){
+fun NewReportsScreen(
+    onNavToHome: () -> Unit,
+    onNaveToMyMedications: () -> Unit
+){
     val reportsViewModel : NewReportsViewModel = viewModel(
         factory = NewReportsViewModel.Factory
     )
@@ -76,18 +80,25 @@ fun NewReportsScreen(){
         },
 
         bottomBar = {
-            OutlinedCard(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(text = "Bottom of the screen!")
-                }
-            }
+            BottomNavBar(
+                onHomeClick = { onNavToHome() },
+                onMyMedicationsClick = { onNaveToMyMedications() },
+                onReportsClick = {}
+            )
+
+
+//            OutlinedCard(
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxWidth(),
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    verticalArrangement = Arrangement.Center
+//                ) {
+//                    Text(text = "Bottom of the screen!")
+//                }
+//            }
         }
     ) { innerPadding ->
         Column(

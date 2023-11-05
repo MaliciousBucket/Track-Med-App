@@ -14,7 +14,7 @@ import com.example.newtrackmed.ui.feature.addmedication.AddMedicationScreen
 import com.example.newtrackmed.ui.feature.home.HomeScreen
 import com.example.newtrackmed.ui.feature.mymedications.MyMedicationsScreen
 import com.example.newtrackmed.ui.feature.report.NewReportsScreen
-import com.example.newtrackmed.ui.feature.report.ReportsScreen
+
 import com.example.newtrackmed.ui.feature.report.TestBarChat
 
 import com.example.newtrackmed.ui.feature.report.testDonut
@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
 //                ) {
 //                    Greeting("Android")
 //                }
-//                TrackMedNavController()
+                TrackMedNavController()
 //                HomeScreen()
 
 //                MyMedicationsScreen()
@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
 //                AddMedicationScreen()
                 //ReportsScreen()
 
-                NewReportsScreen()
+//                NewReportsScreen()
 
 //                TestBarChat()
             }

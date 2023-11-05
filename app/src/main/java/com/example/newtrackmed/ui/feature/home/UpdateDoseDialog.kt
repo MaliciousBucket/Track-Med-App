@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.EditOff
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Redo
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -39,12 +40,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.newtrackmed.R
 import com.example.newtrackmed.data.model.LastTakenDose
 import com.example.newtrackmed.data.model.UpdateDoseActions
 import com.example.newtrackmed.data.model.UpdateDoseData
+import com.example.newtrackmed.data.previewUpdateDoseData
+import com.example.newtrackmed.data.previewUpdateTestData
+import com.example.newtrackmed.ui.theme.NewTrackMedTheme
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -252,7 +257,7 @@ fun CancelIconButton(onCancelClick: () -> Unit){
 @Composable
 fun TakeNowButton(onTakeNowClick: () -> Unit){
     IconButtonWithText(
-        icon = Icons.Filled.CalendarViewDay,
+        icon = Icons.Outlined.Timer,
         text = R.string.take_now
     ) {
         onTakeNowClick()
@@ -355,6 +360,27 @@ fun DisplayMedNotesAndInstructions(
             }
             if (notes != null) {
                 ExpandableCard(title = "Notes", content = notes)
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UpdateDoseDialogPreview(){
+    NewTrackMedTheme {
+        Column( modifier = Modifier.padding(16.dp)) {
+            UpdateDoseDialog(
+                updateDoseData = previewUpdateTestData,
+                onDismissRequest = { /*TODO*/ },
+                onTakeClick = { /*TODO*/ },
+                onUnTakeClick = { /*TODO*/ },
+                onSkipClick = { /*TODO*/ },
+                onMissedClick = { /*TODO*/ },
+                onTakeNowClick = { /*TODO*/ },
+                onCancelClick = { /*TODO*/ },
+                onEditClick = { /*TODO*/ }) {
+
             }
         }
     }

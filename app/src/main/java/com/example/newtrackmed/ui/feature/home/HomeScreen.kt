@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -41,7 +40,11 @@ import com.example.newtrackmed.ui.component.ErrorScreenDisplay
 import com.example.newtrackmed.ui.component.LoadingScreenDisplay
 
 @Composable
-fun HomeScreen(){
+fun HomeScreen(
+    onNavToMyMeds: () -> Unit,
+    onNavigateToReports: () -> Unit,
+    onNavToAddMedication: () -> Unit
+){
     val homeViewModel: HomeScreenViewModel = viewModel(
         factory = HomeScreenViewModel.Factory
     )
@@ -53,7 +56,7 @@ fun HomeScreen(){
                 totalDailyDosesCount = 8,
                 dailyDoseProgress =5,
                 onAddDoseMedClicked = { /*TODO*/ },
-                onAddMedClicked = { homeViewModel.onNextDateClicked() },
+                onAddMedClicked = { onNavToAddMedication() },
                 onAddDoseClicked = { /*TODO*/ },
                 onCalendarClicked = { /*TODO*/ },
                 menuExpanded = false
@@ -65,8 +68,8 @@ fun HomeScreen(){
         bottomBar = {
             BottomNavBar(
                 onHomeClick = { /*TODO*/ },
-                onMyMedicationsClick = { /*TODO*/ },
-                onReportsClick = {}
+                onMyMedicationsClick = { onNavToMyMeds() },
+                onReportsClick = { onNavigateToReports()}
             )
         },
     )
@@ -237,25 +240,4 @@ fun DisplayDoseCards(
             }
         }
     }
-}
-
-@Composable
-fun UpcomingDosesForToday(
-
-){
-
-}
-
-@Composable
-fun RecentDosesView(
-
-){
-
-}
-
-@Composable
-fun RecentDosesViewContainer(
-
-){
-
 }

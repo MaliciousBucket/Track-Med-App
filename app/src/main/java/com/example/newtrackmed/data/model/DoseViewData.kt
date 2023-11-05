@@ -81,7 +81,7 @@ fun mapMedicationToDoseStatusChip(timeToTake: LocalTime, selectedDate: LocalDate
         }
 
         selectedDate.toLocalDate().isEqual(currentTime.toLocalDate())
-                && selectedDate.isBefore(currentTime)-> {
+                && selectedDate.toLocalTime().isBefore(currentTime.toLocalTime())-> {
             DoseChipStatus.Missing
         }
 
